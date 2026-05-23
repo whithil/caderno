@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quest Vault - BG3 Act 3</title>
+    <title>Caderno - Real-time Collaborative Notebook</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -17,8 +17,11 @@
                             sidebar: '#1e1e24',
                             active: '#2e2e38',
                             border: '#31313a',
-                            accent: '#a855f7', // Purple theme matching Mind Flayers
-                            accentHover: '#c084fc',
+                            accent: 'var(--accent-color, #a855f7)',
+                            accentHover: 'var(--accent-hover, #c084fc)',
+                            accentMuted: 'var(--accent-muted, #d8b4fe)',
+                            accentBg: 'var(--accent-bg, rgba(168, 85, 247, 0.15))',
+                            accentBorder: 'var(--accent-border, rgba(168, 85, 247, 0.3))',
                             textMuted: '#9ca3af'
                         }
                     },
@@ -39,6 +42,15 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/diff_match_patch/20121119/diff_match_patch.js"></script>
     
     <style>
+        :root {
+            --accent-color: #a855f7;
+            --accent-hover: #c084fc;
+            --accent-muted: #d8b4fe;
+            --accent-bg: rgba(168, 85, 247, 0.15);
+            --accent-border: rgba(168, 85, 247, 0.3);
+            --accent-gradient-start: #a855f7;
+            --accent-gradient-end: #6366f1;
+        }
         body {
             font-family: 'Inter', sans-serif;
             background-color: #18181c;
@@ -84,7 +96,7 @@
         .markdown-preview h4 {
             font-size: 1rem;
             font-weight: 600;
-            color: #a855f7;
+            color: var(--accent-color);
             margin-top: 1rem;
             margin-bottom: 0.25rem;
         }
@@ -119,8 +131,8 @@
             clip-path: polygon(14% 44%, 0 65%, 50% 100%, 100% 16%, 80% 0%, 43% 62%);
         }
         .obsidian-checkbox:checked {
-            background-color: #a855f7;
-            border-color: #a855f7;
+            background-color: var(--accent-color);
+            border-color: var(--accent-color);
         }
         .obsidian-checkbox:checked::before {
             transform: scale(1);
@@ -164,6 +176,28 @@
             overflow-wrap: break-word;
         }
     </style>
+    <!-- Dynamic Theme Accelerator -->
+    <script>
+        (function() {
+            const savedTheme = localStorage.getItem('caderno_theme_accent') || 'purple';
+            const palettes = {
+                purple: { color: '#a855f7', hover: '#c084fc', muted: '#d8b4fe', bg: 'rgba(168, 85, 247, 0.15)', border: 'rgba(168, 85, 247, 0.3)', gradientStart: '#a855f7', gradientEnd: '#6366f1' },
+                emerald: { color: '#10b981', hover: '#34d399', muted: '#a7f3d0', bg: 'rgba(16, 185, 129, 0.15)', border: 'rgba(16, 185, 129, 0.3)', gradientStart: '#10b981', gradientEnd: '#3b82f6' },
+                indigo: { color: '#6366f1', hover: '#818cf8', muted: '#c7d2fe', bg: 'rgba(99, 102, 241, 0.15)', border: 'rgba(99, 102, 241, 0.3)', gradientStart: '#6366f1', gradientEnd: '#ec4899' },
+                amber: { color: '#f59e0b', hover: '#fbbf24', muted: '#fde68a', bg: 'rgba(245, 158, 11, 0.15)', border: 'rgba(245, 158, 11, 0.3)', gradientStart: '#f59e0b', gradientEnd: '#ef4444' },
+                rose: { color: '#f43f5e', hover: '#fb7185', muted: '#fecdd3', bg: 'rgba(244, 63, 94, 0.15)', border: 'rgba(244, 63, 94, 0.3)', gradientStart: '#f43f5e', gradientEnd: '#a855f7' }
+            };
+            const palette = palettes[savedTheme] || palettes.purple;
+            const root = document.documentElement;
+            root.style.setProperty('--accent-color', palette.color);
+            root.style.setProperty('--accent-hover', palette.hover);
+            root.style.setProperty('--accent-muted', palette.muted);
+            root.style.setProperty('--accent-bg', palette.bg);
+            root.style.setProperty('--accent-border', palette.border);
+            root.style.setProperty('--accent-gradient-start', palette.gradientStart);
+            root.style.setProperty('--accent-gradient-end', palette.gradientEnd);
+        })();
+    </script>
 </head>
 <body class="h-full flex flex-col overflow-hidden">
 
@@ -177,14 +211,14 @@
                 </svg>
             </button>
             <a href="./" class="flex items-center gap-3 hover:opacity-80 transition-opacity">
-                <i class="fa-solid fa-cube text-obsidian-accent text-xl animate-pulse"></i>
-                <span id="vault-logo-text" class="font-bold tracking-tight text-white text-xs sm:text-sm hidden sm:inline">OBSIDIAN QUEST VAULT</span>
+                <i class="fa-solid fa-book-bookmark text-obsidian-accent text-xl animate-pulse"></i>
+                <span id="vault-logo-text" class="font-bold tracking-tight text-white text-xs sm:text-sm hidden sm:inline">CADERNO</span>
                 <div class="h-4 w-[1px] bg-obsidian-border"></div>
                 <div class="flex items-center gap-1.5 text-xs text-obsidian-textMuted font-mono">
                     <i class="fa-solid fa-folder"></i>
                     <span id="breadcrumb-vault-label">vault</span>
                     <i class="fa-solid fa-chevron-right text-[9px]"></i>
-                    <span id="breadcrumb-filename" class="text-gray-300 truncate max-w-[120px] sm:max-w-none">BG3 Act 3 Master Checklist.md</span>
+                    <span id="breadcrumb-filename" class="text-gray-300 truncate max-w-[120px] sm:max-w-none">Roadmap.md</span>
                 </div>
             </a>
         </div>
@@ -194,6 +228,31 @@
                 <span id="active-flag-container" class="flex items-center"></span>
                 <span id="active-lang-code" class="text-[10px] font-bold text-gray-300 uppercase tracking-wider font-mono">EN</span>
             </button>
+
+            <!-- Theme Accent Selector Dropdown -->
+            <div class="relative shrink-0 select-none">
+                <button id="btn-theme-picker" onclick="toggleThemeDropdown(event)" class="px-2 py-1.5 hover:bg-obsidian-active rounded transition-all border border-obsidian-border/50 flex items-center gap-1.5" title="Change Theme / Mudar Tema">
+                    <i class="fa-solid fa-palette text-obsidian-accent"></i>
+                    <span class="text-[10px] font-bold text-gray-300 uppercase tracking-wider font-mono hidden sm:inline">Theme</span>
+                </button>
+                <div id="theme-dropdown" class="absolute right-0 mt-1.5 bg-obsidian-sidebar border border-obsidian-border rounded-lg shadow-xl py-2 w-32 hidden z-50">
+                    <button onclick="changeTheme('purple')" class="w-full text-left px-3 py-1.5 text-xs text-gray-300 hover:bg-obsidian-active hover:text-white flex items-center gap-2 transition-colors">
+                        <span class="w-2.5 h-2.5 rounded-full bg-purple-500"></span> Purple
+                    </button>
+                    <button onclick="changeTheme('emerald')" class="w-full text-left px-3 py-1.5 text-xs text-gray-300 hover:bg-obsidian-active hover:text-white flex items-center gap-2 transition-colors">
+                        <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span> Emerald
+                    </button>
+                    <button onclick="changeTheme('indigo')" class="w-full text-left px-3 py-1.5 text-xs text-gray-300 hover:bg-obsidian-active hover:text-white flex items-center gap-2 transition-colors">
+                        <span class="w-2.5 h-2.5 rounded-full bg-indigo-500"></span> Indigo
+                    </button>
+                    <button onclick="changeTheme('amber')" class="w-full text-left px-3 py-1.5 text-xs text-gray-300 hover:bg-obsidian-active hover:text-white flex items-center gap-2 transition-colors">
+                        <span class="w-2.5 h-2.5 rounded-full bg-amber-500"></span> Amber
+                    </button>
+                    <button onclick="changeTheme('rose')" class="w-full text-left px-3 py-1.5 text-xs text-gray-300 hover:bg-obsidian-active hover:text-white flex items-center gap-2 transition-colors">
+                        <span class="w-2.5 h-2.5 rounded-full bg-rose-500"></span> Rose
+                    </button>
+                </div>
+            </div>
 
             <div id="collab-status-container" class="hidden lg:flex items-center gap-2 px-3 py-1 bg-obsidian-bg/50 border border-obsidian-border rounded-lg text-xs">
                 <div class="flex items-center gap-1.5">
@@ -207,7 +266,7 @@
                 <div id="presence-avatars" class="flex items-center -space-x-1.5 overflow-hidden"></div>
             </div>
 
-            <button onclick="shareSessionLink()" class="px-2.5 py-1.5 sm:px-3 bg-purple-900/30 border border-purple-800/40 text-xs text-purple-300 rounded hover:bg-purple-800/40 hover:text-white transition-all flex items-center gap-1.5 font-semibold">
+            <button onclick="shareSessionLink()" class="px-2.5 py-1.5 sm:px-3 bg-obsidian-accentBg border border-obsidian-accentBorder text-xs text-obsidian-accentMuted rounded hover:bg-obsidian-accent hover:text-white transition-all flex items-center gap-1.5 font-semibold">
                 <i class="fa-solid fa-share-nodes"></i>
                 <span id="share-btn-text" class="hidden md:inline">Share Live Session</span>
             </button>
@@ -240,7 +299,7 @@
             <div class="p-3 flex items-center justify-between text-xs text-obsidian-textMuted uppercase font-semibold tracking-wider select-none">
                 <div class="flex items-center gap-1.5">
                     <i class="fa-solid fa-chevron-down text-[10px]"></i>
-                    <span id="campaign-notes-title">Campaign Notes</span>
+                    <span id="campaign-notes-title">My Notes</span>
                 </div>
                 <button onclick="createNewNote()" class="p-1 hover:bg-obsidian-active text-gray-300 rounded hover:text-obsidian-accent" title="New Note">
                     <i class="fa-solid fa-plus-circle"></i>
@@ -251,7 +310,7 @@
 
             <div class="p-3 bg-obsidian-bg border-t border-obsidian-border">
                 <div class="flex justify-between items-center text-xs mb-1">
-                    <span id="overall-completion-title" class="text-obsidian-textMuted">Overall Completion</span>
+                    <span id="overall-completion-title" class="text-obsidian-textMuted">Task Completion</span>
                     <span id="global-stats-pct" class="font-bold text-obsidian-accent">0%</span>
                 </div>
                 <div class="w-full bg-neutral-800 rounded-full h-1.5 overflow-hidden">
@@ -265,11 +324,11 @@
                 <div class="flex items-center gap-1.5 overflow-x-auto">
                     <div class="bg-obsidian-bg px-3 py-1.5 rounded-t-lg border border-b-0 border-obsidian-border text-xs font-semibold text-white flex items-center gap-2 max-w-[180px] truncate">
                         <i class="fa-regular fa-file-lines text-obsidian-accent"></i>
-                        <span id="active-tab-title">BG3 Act 3 Master Checklist</span>
+                        <span id="active-tab-title">Project Roadmap</span>
                     </div>
                 </div>
 
-                <div id="typing-notification" class="text-xs text-purple-400 font-medium animate-pulse hidden">
+                <div id="typing-notification" class="text-xs text-obsidian-accent font-medium animate-pulse hidden">
                     <i class="fa-solid fa-circle-nodes mr-1"></i> <span id="typing-notification-text">Someone is typing...</span>
                 </div>
 
@@ -286,19 +345,19 @@
                 </div>
             </div>
 
-            <div id="file-progress-header" class="px-6 py-3 bg-purple-950/20 border-b border-purple-900/20 flex flex-col md:flex-row md:items-center justify-between gap-3 shrink-0">
+            <div id="file-progress-header" class="px-6 py-3 bg-obsidian-accentBg border-b border-obsidian-accentBorder/50 flex flex-col md:flex-row md:items-center justify-between gap-3 shrink-0">
                 <div class="flex items-center gap-3">
-                    <div class="p-2 bg-purple-900/30 rounded-lg text-purple-400 border border-purple-800/30">
-                        <i class="fa-solid fa-dragon text-base"></i>
+                    <div class="p-2 bg-obsidian-accentBg rounded-lg text-obsidian-accent border border-obsidian-accentBorder">
+                        <i class="fa-solid fa-square-check text-base"></i>
                     </div>
                     <div>
-                        <div id="campaign-tracker-title" class="text-xs font-semibold text-purple-300 uppercase tracking-wider">Act 3 Campaign Tracker</div>
+                        <div id="campaign-tracker-title" class="text-xs font-semibold text-obsidian-accentMuted uppercase tracking-wider">Task Progress Tracker</div>
                         <div id="progress-text" class="text-sm font-semibold text-white">Calculating objectives...</div>
                     </div>
                 </div>
                 <div class="w-full md:w-64">
                     <div class="w-full bg-neutral-800 rounded-full h-2.5 overflow-hidden">
-                        <div id="progress-bar-fill" class="bg-gradient-to-r from-purple-500 to-indigo-500 h-full w-0 transition-all duration-300"></div>
+                        <div id="progress-bar-fill" class="bg-gradient-to-r from-[var(--accent-gradient-start,#a855f7)] to-[var(--accent-gradient-end,#6366f1)] h-full w-0 transition-all duration-300"></div>
                     </div>
                 </div>
             </div>
@@ -901,24 +960,68 @@
         };
     </script>
 
+    <!-- Theme Accent Management Strategy -->
+    <script>
+        window.toggleThemeDropdown = function(event) {
+            if (event) event.stopPropagation();
+            const dropdown = document.getElementById('theme-dropdown');
+            if (dropdown) dropdown.classList.toggle('hidden');
+        };
+
+        window.changeTheme = function(themeKey) {
+            const palettes = {
+                purple: { color: '#a855f7', hover: '#c084fc', muted: '#d8b4fe', bg: 'rgba(168, 85, 247, 0.15)', border: 'rgba(168, 85, 247, 0.3)', gradientStart: '#a855f7', gradientEnd: '#6366f1' },
+                emerald: { color: '#10b981', hover: '#34d399', muted: '#a7f3d0', bg: 'rgba(16, 185, 129, 0.15)', border: 'rgba(16, 185, 129, 0.3)', gradientStart: '#10b981', gradientEnd: '#3b82f6' },
+                indigo: { color: '#6366f1', hover: '#818cf8', muted: '#c7d2fe', bg: 'rgba(99, 102, 241, 0.15)', border: 'rgba(99, 102, 241, 0.3)', gradientStart: '#6366f1', gradientEnd: '#ec4899' },
+                amber: { color: '#f59e0b', hover: '#fbbf24', muted: '#fde68a', bg: 'rgba(245, 158, 11, 0.15)', border: 'rgba(245, 158, 11, 0.3)', gradientStart: '#f59e0b', gradientEnd: '#ef4444' },
+                rose: { color: '#f43f5e', hover: '#fb7185', muted: '#fecdd3', bg: 'rgba(244, 63, 94, 0.15)', border: 'rgba(244, 63, 94, 0.3)', gradientStart: '#f43f5e', gradientEnd: '#a855f7' }
+            };
+            const palette = palettes[themeKey] || palettes.purple;
+            const root = document.documentElement;
+            root.style.setProperty('--accent-color', palette.color);
+            root.style.setProperty('--accent-hover', palette.hover);
+            root.style.setProperty('--accent-muted', palette.muted);
+            root.style.setProperty('--accent-bg', palette.bg);
+            root.style.setProperty('--accent-border', palette.border);
+            root.style.setProperty('--accent-gradient-start', palette.gradientStart);
+            root.style.setProperty('--accent-gradient-end', palette.gradientEnd);
+            localStorage.setItem('caderno_theme_accent', themeKey);
+            
+            // Hide the dropdown after selection
+            const dropdown = document.getElementById('theme-dropdown');
+            if (dropdown) dropdown.classList.add('hidden');
+            
+            showToast(currentLang === 'pt-br' ? "Tema alterado com sucesso!" : "Theme accent updated successfully!", "success");
+        };
+
+        // Add a general window click listener to close the dropdown when clicking outside
+        window.addEventListener('click', function(e) {
+            const dropdown = document.getElementById('theme-dropdown');
+            const pickerBtn = document.getElementById('btn-theme-picker');
+            if (dropdown && pickerBtn && !pickerBtn.contains(e.target) && !dropdown.contains(e.target)) {
+                dropdown.classList.add('hidden');
+            }
+        });
+    </script>
+
     <!-- Language Translation Strategy -->
     <script>
         const i18n = {
             'en': {
-                vaultTitle: "OBSIDIAN QUEST VAULT",
-                breadcrumbFolder: "vault",
+                vaultTitle: "CADERNO",
+                breadcrumbFolder: "notebook",
                 collabConnecting: "Connecting live...",
                 collabActive: "Peer(s) Active",
                 collabAwaiting: "Awaiting Peers",
                 shareBtn: "Share Live Session",
                 quickSearch: "Quick Search",
                 searchNotes: "Search notes...",
-                campaignNotes: "Campaign Notes",
-                overallCompletion: "Overall Completion",
+                campaignNotes: "My Notes",
+                overallCompletion: "Task Completion",
                 modeEdit: "Edit",
                 modeReading: "Reading",
                 modeSplit: "Split",
-                campaignTracker: "Act 3 Campaign Tracker",
+                campaignTracker: "Task Progress Tracker",
                 calculating: "Calculating objectives...",
                 titlePlaceholder: "Untitled Note",
                 wordCount: "words",
@@ -938,9 +1041,9 @@
                 delete: "Delete",
                 toastCreated: "Created a new note",
                 toastDeleted: "Deleted \"{title}\"",
-                toastQuestCompleted: "Quest completed!",
-                toastQuestReset: "Quest reset",
-                toastSyncHost: "Vault initialized from Host!",
+                toastQuestCompleted: "Task completed!",
+                toastQuestReset: "Task reset",
+                toastSyncHost: "Notebook initialized from Host!",
                 toastCollabConnected: "Connected successfully with a collaborator!",
                 toastCollabDisconnected: "Collaborator disconnected.",
                 toastP2PError: "P2P Signalling Error. Operating in offline fallback mode.",
@@ -950,20 +1053,20 @@
                 downloadBtnLabel: "Download .md"
             },
             'pt-br': {
-                vaultTitle: "BAÚ DE MISSÕES OBSIDIAN",
-                breadcrumbFolder: "bau",
+                vaultTitle: "CADERNO",
+                breadcrumbFolder: "caderno",
                 collabConnecting: "Conectando ao vivo...",
                 collabActive: "Par(es) Ativo(s)",
                 collabAwaiting: "Aguardando Pares",
                 shareBtn: "Compartilhar Sessão",
                 quickSearch: "Busca Rápida",
                 searchNotes: "Buscar notas...",
-                campaignNotes: "Notas de Campanha",
-                overallCompletion: "Progresso Geral",
+                campaignNotes: "Minhas Notas",
+                overallCompletion: "Progresso de Tarefas",
                 modeEdit: "Editar",
                 modeReading: "Leitura",
                 modeSplit: "Dividido",
-                campaignTracker: "Rastreador de Campanha Act 3",
+                campaignTracker: "Rastreador de Tarefas",
                 calculating: "Calculando objetivos...",
                 titlePlaceholder: "Nota sem Título",
                 wordCount: "palavras",
@@ -983,9 +1086,9 @@
                 delete: "Excluir",
                 toastCreated: "Nova nota criada",
                 toastDeleted: "Excluído \"{title}\"",
-                toastQuestCompleted: "Missão completada!",
-                toastQuestReset: "Missão resetada",
-                toastSyncHost: "Baú inicializado pelo Hospedeiro!",
+                toastQuestCompleted: "Tarefa concluída!",
+                toastQuestReset: "Tarefa reiniciada!",
+                toastSyncHost: "Caderno inicializado pelo Hospedeiro!",
                 toastCollabConnected: "Conectado com sucesso a um colaborador!",
                 toastCollabDisconnected: "Colaborador desconectado.",
                 toastP2PError: "Erro de Sinalização P2P. Operando em modo offline.",
@@ -1002,7 +1105,7 @@
         let currentLang = 'en';
 
         function initLanguageSystem() {
-            const savedLanguage = localStorage.getItem("obsidian_language");
+            const savedLanguage = localStorage.getItem("caderno_language");
             if (savedLanguage === 'en' || savedLanguage === 'pt-br') {
                 currentLang = savedLanguage;
             } else {
@@ -1015,7 +1118,7 @@
         function toggleLanguage() {
             const nextLang = currentLang === 'en' ? 'pt-br' : 'en';
             currentLang = nextLang;
-            localStorage.setItem("obsidian_language", nextLang);
+            localStorage.setItem("caderno_language", nextLang);
             applyUILanguage(nextLang);
             showToast(nextLang === 'pt-br' ? "Idioma alterado para Português!" : "Language changed to English!", "info");
         }
@@ -1093,7 +1196,7 @@
             if (window.vaultInitialized) return;
             initLanguageSystem();
 
-            const savedVault = localStorage.getItem("obsidian_quest_vault");
+            const savedVault = localStorage.getItem("caderno_vault");
             if (savedVault) {
                 try {
                     vault = JSON.parse(savedVault);
@@ -1104,7 +1207,7 @@
                 loadDefaultVault(currentLang);
             }
 
-            const savedActiveKey = localStorage.getItem("obsidian_active_key");
+            const savedActiveKey = localStorage.getItem("caderno_active_key");
             if (savedActiveKey && vault[savedActiveKey]) {
                 activeNoteKey = savedActiveKey;
             } else {
@@ -1146,12 +1249,12 @@
 
         function loadDefaultVault(lang) {
             vault = {
-                "bg3_act3_checklist": {
-                    title: lang === 'pt-br' ? "BG3 Ato 3 Checklist de Conclusão" : "BG3 Act 3 Master Checklist",
-                    content: getBG3ChecklistMarkdown(lang)
+                "project_roadmap": {
+                    title: lang === 'pt-br' ? "Roteiro do Projeto & Tarefas" : "Project Roadmap & Tasks",
+                    content: getRoadmapMarkdown(lang)
                 },
-                "obsidian_guide": {
-                    title: lang === 'pt-br' ? "Guia do Baú de Missões Obsidian" : "Welcome to Obsidian Quest-Vault",
+                "welcome_guide": {
+                    title: lang === 'pt-br' ? "Bem-vindo ao Caderno" : "Welcome to Caderno",
                     content: getWelcomeGuideMarkdown(lang)
                 }
             };
@@ -1160,8 +1263,8 @@
 
         // Dedicated local saver. Prevents unnecessary network broadcasting when simply switching tabs.
         function saveVaultLocalOnly() {
-            localStorage.setItem("obsidian_quest_vault", JSON.stringify(vault));
-            localStorage.setItem("obsidian_active_key", activeNoteKey);
+            localStorage.setItem("caderno_vault", JSON.stringify(vault));
+            localStorage.setItem("caderno_active_key", activeNoteKey);
             updateGlobalProgressTracker();
         }
 
@@ -1779,7 +1882,7 @@
         function showToast(message, type = 'info') {
             const container = document.getElementById('toast-container');
             const toast = document.createElement('div');
-            toast.className = `p-3 rounded-lg shadow-2xl flex items-center justify-between text-xs font-semibold transition-all duration-300 transform translate-y-2 opacity-0 select-none ${type === 'success' ? 'bg-purple-900/90 text-purple-200 border border-purple-600' : 'bg-neutral-800/90 text-neutral-200 border border-neutral-700'}`;
+            toast.className = `p-3 rounded-lg shadow-2xl flex items-center justify-between text-xs font-semibold transition-all duration-300 transform translate-y-2 opacity-0 select-none ${type === 'success' ? 'bg-obsidian-accentBg text-obsidian-accentMuted border border-obsidian-accentBorder shadow-xl shadow-obsidian-accent/10' : 'bg-neutral-800/90 text-neutral-200 border border-neutral-700'}`;
             toast.innerHTML = `<span>${message}</span><button class="ml-3 hover:text-white" onclick="this.parentElement.remove()">&times;</button>`;
             container.appendChild(toast);
             
@@ -1787,19 +1890,19 @@
             setTimeout(() => { toast.classList.add('opacity-0', 'translate-y-2'); setTimeout(() => toast.remove(), 300); }, 4000);
         }
 
-        function getBG3ChecklistMarkdown(lang) {
+        function getRoadmapMarkdown(lang) {
             if (lang === 'pt-br') {
-                return `# 🐉 Baldur's Gate 3: Checklist de Conclusão do Ato 3\n\n## 🗺️ 1. Rivington & Wyrm's Crossing\n### 🎪 1.1 Circo dos Últimos Dias\n- [ ] **Coletar as 7 partes de Dribbles** para as Luvas do Poder Mágico.\n- [ ] **Roubar o Anel do Djinn** e ganhar a Nyrulna.\n\n## 🏙️ 2. A Cidade Baixa\n### 🔮 2.1 Artigos de Magia\n- [ ] **Desbloquear Markoheshkir** e as Vestes do Tecido.\n- [ ] **Roubar o Códice de Karsus** dos cofres.\n\n### 🧛 2.2 Palácio de Szarr\n- [ ] **Derrotar Cazador** e decidir o destino dos 7.000 servos.\n- [ ] **Saquear Rhapsody** e Cajado da Dor.\n\n## ⚖️ 3. Casa da Esperança\n- [ ] **Roubar o Martelo Órfico**, Amuleto da Saúde e Luvas.\n- [ ] **Salvar Esperança** e obter a Armadura Helldusk.`;
+                return `# 🚀 Roteiro de Lançamento do Projeto\n\n## 📅 Fase 1: Pesquisa & Descoberta\n- [ ] **Definir requisitos** e o escopo do MVP do projeto.\n- [ ] **Criar wireframes** e esboços de design para revisão da equipe.\n- [ ] **Alinhar a stack tecnológica** e os modelos de banco de dados.\n\n## 💻 Fase 2: Design & Desenvolvimento\n- [ ] **Configurar a estrutura do código** e roteamento básico.\n- [ ] **Implementar motores de colaboração em tempo real** (sincronização P2P).\n- [ ] **Otimizar métricas de performance** para melhor experiência do usuário.\n\n## 🚀 Fase 3: Lançamento & Iteração\n- [ ] **Realizar testes beta** com usuários internos.\n- [ ] **Coletar feedback dos usuários** e priorizar melhorias.\n- [ ] **Implantar o projeto Caderno v1.0** em produção!`;
             } else {
-                return `# 🐉 Baldur's Gate 3: Act 3 Completionist Checklist\n\n## 🗺️ 1. Rivington & Wyrm's Crossing\n### 🎪 1.1 Circus of the Last Days\n- [ ] **Collect all 7 parts of Dribbles** for the Spellmight Gloves.\n- [ ] **Steal the Djinn's Ring** and win Nyrulna.\n\n## 🏙️ 2. The Lower City\n### 🔮 2.1 Sorcerous Sundries\n- [ ] **Unlock Markoheshkir** and the Robe of the Weave.\n- [ ] **Steal the Karsus Codex** from the vaults.\n\n### 🧛 2.2 Palace of Szarr\n- [ ] **Defeat Cazador** and decide the fate of the 7,000 spawn.\n- [ ] **Loot Rhapsody** and the Woe Staff.\n\n## ⚖️ 3. House of Hope\n- [ ] **Steal the Orphic Hammer**, Amulet of Health, and Gauntlets.\n- [ ] **Save Hope** and acquire the Helldusk Armour.`;
+                return `# 🚀 Project Launch Roadmap\n\n## 📅 Phase 1: Research & Discovery\n- [ ] **Define requirements** and scope the project MVP.\n- [ ] **Create wireframes** and design mockups for team review.\n- [ ] **Align on the tech stack** and database models.\n\n## 💻 Phase 2: Design & Development\n- [ ] **Set up codebase structure** and basic routing.\n- [ ] **Implement real-time collaboration engines** (P2P synchronization).\n- [ ] **Optimize performance metrics** for peak user interaction.\n\n## 🚀 Phase 3: Launch & Iteration\n- [ ] **Conduct beta testing** with internal users.\n- [ ] **Gather user feedback** and prioritize enhancements.\n- [ ] **Deploy project Caderno v1.0** to production!`;
             }
         }
 
         function getWelcomeGuideMarkdown(lang) {
             if (lang === 'pt-br') {
-                return `# Bem-vindo ao Baú de Missões Obsidian 🔮\n\n### 👥 Sincronização Diferencial P2P\n1. **Sessão Compartilhada:** Envie o link para o seu grupo.\n2. **Resolução de Conflitos (Novo!):** Edições simultâneas agora são mescladas (merged) de forma inteligente em vez de serem substituídas.\n3. **Caret Dinâmico:** Seu cursor de texto não se perde mais quando seus amigos estão digitando!\n4. **[NOVO] Cursores ao Vivo:** Agora você pode ver com precisão onde seus aliados estão editando.`;
+                return `# Bem-vindo ao Caderno 📓\n\n### 👥 Sincronização P2P em Tempo Real\n1. **Sessão Compartilhada:** Envie o link de colaboração para a sua equipe.\n2. **Resolução de Conflitos:** Edições simultâneas são mescladas de forma inteligente e automática.\n3. **Caret Dinâmico:** Seu cursor de digitação acompanha as edições dos seus colegas sem se perder!\n4. **Cursores ao Vivo:** Veja com precisão cirúrgica onde cada membro do time está editando em tempo real.`;
             } else {
-                return `# Welcome to Obsidian Quest-Vault 🔮\n\n### 👥 P2P Differential Sync\n1. **Shared Session:** Send the link to your party.\n2. **Conflict Resolution (New!):** Simultaneous edits are now smartly patched together using Google's diff-match-patch library.\n3. **Dynamic Caret Preservation:** Your text cursor will gracefully shift alongside real-time edits made by your friends!\n4. **[NEW] Live Presence Cursors:** You can now see precisely where your allies are editing in real-time.`;
+                return `# Welcome to Caderno 📓\n\n### 👥 Real-Time P2P Differential Sync\n1. **Shared Session:** Send the collaboration link to your team.\n2. **Conflict Resolution:** Simultaneous edits are now merged intelligently in real-time.\n3. **Dynamic Caret:** Your text cursor shifts gracefully while others type.\n4. **Live Presence Cursors:** See exactly where your team members are editing in real-time.`;
             }
         }
     </script>
