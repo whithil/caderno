@@ -212,28 +212,28 @@
             </button>
             <a href="./" class="flex items-center gap-3 hover:opacity-80 transition-opacity">
                 <i class="fa-solid fa-book-bookmark text-obsidian-accent text-xl animate-pulse"></i>
-                <span id="vault-logo-text" class="font-bold tracking-tight text-white text-xs sm:text-sm hidden sm:inline">CADERNO</span>
+                <span id="vault-logo-text" class="font-bold tracking-tight text-white text-xs sm:text-sm hidden md:inline">CADERNO</span>
                 <div class="h-4 w-[1px] bg-obsidian-border"></div>
                 <div class="flex items-center gap-1.5 text-xs text-obsidian-textMuted font-mono">
                     <i class="fa-solid fa-folder"></i>
-                    <span id="breadcrumb-vault-label">vault</span>
-                    <i class="fa-solid fa-chevron-right text-[9px]"></i>
-                    <span id="breadcrumb-filename" class="text-gray-300 truncate max-w-[120px] sm:max-w-none">Roadmap.md</span>
+                    <span id="breadcrumb-vault-label" class="hidden sm:inline">vault</span>
+                    <i class="fa-solid fa-chevron-right text-[9px] hidden sm:inline"></i>
+                    <span id="breadcrumb-filename" class="text-gray-300 truncate max-w-[120px] sm:max-w-[200px]">Roadmap.md</span>
                 </div>
             </a>
         </div>
         
-        <div class="flex items-center gap-2 sm:gap-3">
+        <div class="flex items-center gap-1.5 sm:gap-2 lg:gap-3 shrink-0">
             <button onclick="toggleLanguage()" class="px-2 py-1.5 hover:bg-obsidian-active rounded transition-all border border-obsidian-border/50 flex items-center gap-1.5 shrink-0" title="Change Language / Alterar Idioma">
                 <span id="active-flag-container" class="flex items-center"></span>
-                <span id="active-lang-code" class="text-[10px] font-bold text-gray-300 uppercase tracking-wider font-mono">EN</span>
+                <span id="active-lang-code" class="text-[10px] font-bold text-gray-300 uppercase tracking-wider font-mono hidden md:inline">EN</span>
             </button>
 
             <!-- Theme Accent Selector Dropdown -->
             <div class="relative shrink-0 select-none">
                 <button id="btn-theme-picker" onclick="toggleThemeDropdown(event)" class="px-2 py-1.5 hover:bg-obsidian-active rounded transition-all border border-obsidian-border/50 flex items-center gap-1.5" title="Change Theme / Mudar Tema">
                     <i class="fa-solid fa-palette text-obsidian-accent"></i>
-                    <span class="text-[10px] font-bold text-gray-300 uppercase tracking-wider font-mono hidden sm:inline">Theme</span>
+                    <span class="text-[10px] font-bold text-gray-300 uppercase tracking-wider font-mono hidden md:inline">Theme</span>
                 </button>
                 <div id="theme-dropdown" class="absolute right-0 mt-1.5 bg-obsidian-sidebar border border-obsidian-border rounded-lg shadow-xl py-2 w-32 hidden z-50">
                     <button onclick="changeTheme('purple')" class="w-full text-left px-3 py-1.5 text-xs text-gray-300 hover:bg-obsidian-active hover:text-white flex items-center gap-2 transition-colors">
@@ -254,30 +254,30 @@
                 </div>
             </div>
 
-            <div id="collab-status-container" class="hidden lg:flex items-center gap-2 px-3 py-1 bg-obsidian-bg/50 border border-obsidian-border rounded-lg text-xs">
+            <div id="collab-status-container" class="hidden sm:flex items-center gap-2 px-2 lg:px-3 py-1 bg-obsidian-bg/50 border border-obsidian-border rounded-lg text-xs shrink-0" title="Collaboration Status">
                 <div class="flex items-center gap-1.5">
                     <span class="relative flex h-2 w-2">
                         <span id="presence-pulse" class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
                         <span id="presence-indicator" class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
                     </span>
-                    <span id="collab-status-text" class="text-neutral-400 font-medium">Connecting live...</span>
+                    <span id="collab-status-text" class="text-neutral-400 font-medium hidden lg:inline">Connecting live...</span>
                 </div>
-                <div class="h-3 w-[1px] bg-obsidian-border"></div>
+                <div class="h-3 w-[1px] bg-obsidian-border hidden lg:block"></div>
                 <div id="presence-avatars" class="flex items-center -space-x-1.5 overflow-hidden"></div>
             </div>
 
-            <button onclick="shareSessionLink()" class="px-2.5 py-1.5 sm:px-3 bg-obsidian-accentBg border border-obsidian-accentBorder text-xs text-obsidian-accentMuted rounded hover:bg-obsidian-accent hover:text-white transition-all flex items-center gap-1.5 font-semibold">
+            <button onclick="shareSessionLink()" class="px-2 py-1.5 lg:px-3 bg-obsidian-accentBg border border-obsidian-accentBorder text-xs text-obsidian-accentMuted rounded hover:bg-obsidian-accent hover:text-white transition-all flex items-center gap-1.5 font-semibold shrink-0" title="Share Session Link">
                 <i class="fa-solid fa-share-nodes"></i>
-                <span id="share-btn-text" class="hidden md:inline">Share Live Session</span>
+                <span id="share-btn-text" class="hidden lg:inline">Share Live Session</span>
             </button>
 
-            <button onclick="openCommandPalette()" class="px-2.5 py-1.5 sm:px-3 bg-obsidian-bg border border-obsidian-border text-xs text-obsidian-textMuted rounded hover:bg-obsidian-active hover:text-white transition-all flex items-center gap-2">
+            <button onclick="openCommandPalette()" class="px-2 py-1.5 lg:px-3 bg-obsidian-bg border border-obsidian-border text-xs text-obsidian-textMuted rounded hover:bg-obsidian-active hover:text-white transition-all flex items-center gap-2 shrink-0" title="Quick Search">
                 <i class="fa-solid fa-magnifying-glass"></i>
-                <span id="quick-search-text" class="hidden sm:inline">Quick Search</span>
-                <kbd class="hidden md:inline bg-obsidian-sidebar px-1 py-0.5 rounded text-[9px] border border-neutral-700 font-mono">Ctrl P</kbd>
+                <span id="quick-search-text" class="hidden md:inline">Quick Search</span>
+                <kbd class="hidden xl:inline bg-obsidian-sidebar px-1 py-0.5 rounded text-[9px] border border-neutral-700 font-mono">Ctrl P</kbd>
             </button>
 
-            <button id="btn-toggle-right" onclick="toggleSidebar('right-sidebar')" class="p-1.5 hover:bg-obsidian-active rounded transition-all border border-transparent" title="Toggle Document Outline (Ctrl+Shift+O)">
+            <button id="btn-toggle-right" onclick="toggleSidebar('right-sidebar')" class="p-1.5 hover:bg-obsidian-active rounded transition-all border border-transparent shrink-0" title="Toggle Document Outline (Ctrl+Shift+O)">
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="w-[17px] h-[17px]">
                     <rect x="3" y="3" width="18" height="18" rx="2" />
                     <line x1="15" y1="3" x2="15" y2="21" />
@@ -332,7 +332,7 @@
                     <i class="fa-solid fa-circle-nodes mr-1"></i> <span id="typing-notification-text">Someone is typing...</span>
                 </div>
 
-                <div class="flex items-center bg-obsidian-bg rounded p-0.5 border border-obsidian-border">
+                <div class="flex items-center bg-obsidian-bg rounded p-0.5 border border-obsidian-border shrink-0">
                     <button id="btn-edit-mode" onclick="setViewMode('edit')" class="px-2.5 py-1 text-xs font-medium rounded transition-colors text-obsidian-textMuted hover:text-white" title="Markdown Source Mode">
                         <i class="fa-solid fa-code mr-1"></i> Edit
                     </button>
@@ -363,7 +363,7 @@
             </div>
 
             <div class="flex-1 flex overflow-hidden relative">
-                <div id="editor-container" class="flex-1 flex flex-col overflow-hidden">
+                <div id="editor-container" class="flex-1 flex flex-col overflow-hidden relative">
                     <div class="p-4 bg-obsidian-bg border-b border-obsidian-border flex items-center justify-between gap-3 shrink-0">
                         <div class="flex items-center gap-3 flex-1 overflow-hidden">
                             <span id="title-header-label" class="text-xs font-bold text-neutral-500 uppercase shrink-0">TITLE</span>
@@ -375,9 +375,9 @@
                         </button>
                     </div>
                     <div class="flex-1 flex overflow-hidden">
-                        <div id="line-numbers" class="w-10 text-right pr-2 text-neutral-600 font-mono text-xs select-none py-4 border-r border-obsidian-border bg-obsidian-sidebar/20 leading-6 shrink-0"></div>
-                        <div class="flex-1 relative overflow-hidden flex">
-                            <textarea id="markdown-textarea" onscroll="handleEditorScroll()" oninput="handleSourceInput()" onkeyup="reportCursorMove()" onclick="reportCursorMove()" class="flex-1 bg-transparent text-gray-200 p-4 outline-none resize-none font-mono text-sm leading-6 overflow-y-auto" placeholder="Start writing markdown content..."></textarea>
+                        <div id="line-numbers" class="w-10 text-right pr-2 text-neutral-600 font-mono text-xs select-none py-4 border-r border-obsidian-border bg-obsidian-sidebar/20 shrink-0"></div>
+                        <div class="flex-1 relative overflow-hidden flex flex-col">
+                            <textarea id="markdown-textarea" onscroll="handleEditorScroll()" oninput="handleSourceInput()" onkeyup="reportCursorMove()" onclick="reportCursorMove()" class="flex-1 bg-transparent text-gray-200 p-4 outline-none resize-none font-mono text-sm leading-6 overflow-y-auto block w-full" placeholder="Start writing markdown content..."></textarea>
                             <div id="editor-cursors-layer" class="absolute inset-0 pointer-events-none overflow-hidden z-10"></div>
                         </div>
                     </div>
@@ -414,7 +414,7 @@
 
     <!-- COMMAND PALETTE MODAL -->
     <div id="command-palette" class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden items-start justify-center pt-24 z-50 transition-all duration-300">
-        <div class="bg-obsidian-sidebar border border-obsidian-border rounded-xl shadow-2xl w-full max-w-lg overflow-hidden flex flex-col">
+        <div class="bg-obsidian-sidebar border border-obsidian-border rounded-xl shadow-2xl w-full max-w-lg overflow-hidden flex flex-col mx-4">
             <div class="p-3 border-b border-obsidian-border flex items-center gap-2">
                 <i class="fa-solid fa-magnifying-glass text-obsidian-accent"></i>
                 <input id="palette-search" type="text" oninput="handlePaletteSearch()" placeholder="Type to search notes and headings..." class="bg-transparent border-none outline-none text-white text-sm flex-1 placeholder-neutral-500">
@@ -684,19 +684,34 @@
                                 reportCursorMove();
                             }
                         } else {
+                            // Background note updated natively. Sync global stats and lists cleanly.
                             window.updateGlobalProgressTracker();
+                            window.renderVaultList();
                         }
                     }
                     break;
 
                 case 'PRESENCE':
                     if (senderConn.peer) {
+                        const p = remotePeersData[senderConn.peer];
+                        const newNote = msg.activeNoteKey || window.activeNoteKey;
+                        
+                        // Detect Peer Note Jumping for Live Toasts Invitations
+                        if (p && p.activeNote && p.activeNote !== newNote) {
+                            if (newNote === window.activeNoteKey) {
+                                const existingToast = document.getElementById(`toast-nav-${senderConn.peer}`);
+                                if (existingToast) existingToast.remove();
+                            } else if (vault[newNote]) {
+                                window.showNavigationToast(senderConn.peer, msg.name, newNote);
+                            }
+                        }
+
                         remotePeersData[senderConn.peer] = {
                             name: msg.name,
                             color: msg.color,
                             isTyping: msg.isTyping,
-                            activeNote: msg.activeNoteKey || window.activeNoteKey, 
-                            cursorPos: msg.cursorPos !== undefined ? msg.cursorPos : remotePeersData[senderConn.peer]?.cursorPos,
+                            activeNote: newNote, 
+                            cursorPos: msg.cursorPos !== undefined ? msg.cursorPos : p?.cursorPos,
                             timestamp: Date.now()
                         };
                         renderPresenceList();
@@ -706,8 +721,21 @@
 
                 case 'CURSOR_MOVE':
                     if (senderConn.peer && remotePeersData[senderConn.peer]) {
-                        remotePeersData[senderConn.peer].cursorPos = msg.pos;
-                        remotePeersData[senderConn.peer].activeNote = msg.noteKey;
+                        const p = remotePeersData[senderConn.peer];
+                        const newNote = msg.noteKey;
+                        
+                        // Detect Fast Peer Cursor Jumps between files
+                        if (p.activeNote && p.activeNote !== newNote) {
+                            if (newNote === window.activeNoteKey) {
+                                const existingToast = document.getElementById(`toast-nav-${senderConn.peer}`);
+                                if (existingToast) existingToast.remove();
+                            } else if (vault[newNote]) {
+                                window.showNavigationToast(senderConn.peer, p.name, newNote);
+                            }
+                        }
+                        
+                        p.cursorPos = msg.pos;
+                        p.activeNote = newNote;
                         renderRemoteCursors();
                     }
                     break;
@@ -1099,8 +1127,8 @@
             }
         };
 
-        const svgBr = `<svg class="w-5 h-3.5 rounded shadow-sm border border-neutral-700/50" viewBox="0 0 720 500" fill="none" xmlns="http://www.w3.org/2000/svg"><rect width="720" height="500" fill="#009c3b"/><polygon points="360,80 80,250 360,420 640,250" fill="#ffdf00"/><circle cx="360" cy="250" r="120" fill="#002171"/><path d="M 240,250 A 120,120 0 0,0 480,250" fill="none" stroke="#ffffff" stroke-width="12" stroke-linecap="round"/></svg>`;
-        const svgEn = `<svg class="w-5 h-3.5 rounded shadow-sm border border-neutral-700/50" viewBox="0 0 20 14" fill="none" xmlns="http://www.w3.org/2000/svg"><rect width="20" height="14" fill="#B91C1C"/><path d="M0 1H20M0 3H20M0 5H20M0 7H20M0 9H20M0 11H20M0 13H20" stroke="#FFFFFF" stroke-width="1"/><rect width="9" height="7" fill="#1E3A8A"/><circle cx="2" cy="2" r="0.4" fill="white"/><circle cx="4" cy="2" r="0.4" fill="white"/><circle cx="6" cy="2" r="0.4" fill="white"/><circle cx="3" cy="3.5" r="0.4" fill="white"/><circle cx="5" cy="3.5" r="0.4" fill="white"/><circle cx="2" cy="5" r="0.4" fill="white"/><circle cx="4" cy="5" r="0.4" fill="white"/><circle cx="6" cy="5" r="0.4" fill="white"/></svg>`;
+        const svgBr = `<svg class="w-5 h-3.5 rounded shadow-sm border border-neutral-700/50 shrink-0" viewBox="0 0 720 500" fill="none" xmlns="http://www.w3.org/2000/svg"><rect width="720" height="500" fill="#009c3b"/><polygon points="360,80 80,250 360,420 640,250" fill="#ffdf00"/><circle cx="360" cy="250" r="120" fill="#002171"/><path d="M 240,250 A 120,120 0 0,0 480,250" fill="none" stroke="#ffffff" stroke-width="12" stroke-linecap="round"/></svg>`;
+        const svgEn = `<svg class="w-5 h-3.5 rounded shadow-sm border border-neutral-700/50 shrink-0" viewBox="0 0 20 14" fill="none" xmlns="http://www.w3.org/2000/svg"><rect width="20" height="14" fill="#B91C1C"/><path d="M0 1H20M0 3H20M0 5H20M0 7H20M0 9H20M0 11H20M0 13H20" stroke="#FFFFFF" stroke-width="1"/><rect width="9" height="7" fill="#1E3A8A"/><circle cx="2" cy="2" r="0.4" fill="white"/><circle cx="4" cy="2" r="0.4" fill="white"/><circle cx="6" cy="2" r="0.4" fill="white"/><circle cx="3" cy="3.5" r="0.4" fill="white"/><circle cx="5" cy="3.5" r="0.4" fill="white"/><circle cx="2" cy="5" r="0.4" fill="white"/><circle cx="4" cy="5" r="0.4" fill="white"/><circle cx="6" cy="5" r="0.4" fill="white"/></svg>`;
 
         let currentLang = 'en';
 
@@ -1226,6 +1254,14 @@
             loadActiveNote();
             setViewMode("split");
             window.initP2PEngine();
+
+            // Setup ResizeObserver for smart line-wrapping detection
+            const textarea = document.getElementById('markdown-textarea');
+            if (textarea) {
+                new ResizeObserver(() => {
+                    if (window.updateLineNumbers) window.updateLineNumbers();
+                }).observe(textarea);
+            }
 
             window.addEventListener('keydown', function(e) {
                 if (e.key === 'Escape') {
@@ -1405,7 +1441,7 @@
             const preview = document.getElementById('rendered-preview');
             preview.innerHTML = renderMarkdown(note.content);
 
-            updateLineNumbers();
+            if (window.updateLineNumbers) window.updateLineNumbers();
             updateWordCount(note.content);
             renderOutline(note.content);
             updateChecklistProgress(note.content);
@@ -1414,13 +1450,62 @@
             if (window.renderRemoteCursors) window.renderRemoteCursors();
         }
 
-        function updateLineNumbers() {
-            const lines = document.getElementById('markdown-textarea').value.split('\n').length;
+        // Smart Line-Wrap Tracking Algorithm
+        let updateLineNumbersTimeout = null;
+        window.updateLineNumbers = function() {
+            const textarea = document.getElementById('markdown-textarea');
             const container = document.getElementById('line-numbers');
-            let content = '';
-            for (let i = 1; i <= lines; i++) content += `<div>${i}</div>`;
-            container.innerHTML = content;
-        }
+            if (!textarea || !container) return;
+
+            if (updateLineNumbersTimeout) clearTimeout(updateLineNumbersTimeout);
+            
+            updateLineNumbersTimeout = setTimeout(() => {
+                const lines = textarea.value.split('\n');
+                
+                let mirror = document.getElementById('line-mirror');
+                if (!mirror) {
+                    mirror = document.createElement('div');
+                    mirror.id = 'line-mirror';
+                    textarea.parentElement.appendChild(mirror);
+                    mirror.style.position = 'absolute';
+                    mirror.style.visibility = 'hidden';
+                    mirror.style.pointerEvents = 'none';
+                    mirror.style.top = '0';
+                    mirror.style.left = '0';
+                    mirror.style.zIndex = '-999';
+                }
+                
+                // Copy critical styling measurements to simulate exact word wraps natively
+                const computed = window.getComputedStyle(textarea);
+                mirror.style.fontFamily = computed.fontFamily;
+                mirror.style.fontSize = computed.fontSize;
+                mirror.style.lineHeight = computed.lineHeight;
+                mirror.style.padding = computed.padding;
+                mirror.style.border = 'none'; 
+                mirror.style.width = textarea.clientWidth + 'px'; 
+                mirror.style.whiteSpace = 'pre-wrap';
+                mirror.style.wordWrap = 'break-word';
+                mirror.style.boxSizing = 'border-box';
+
+                let mirrorHTML = '';
+                lines.forEach(line => {
+                    // Inject zero-width space on empty lines to accurately measure blank line heights
+                    mirrorHTML += `<div>${escapeHTML(line) || '&#8203;'}</div>`;
+                });
+                mirror.innerHTML = mirrorHTML;
+                
+                const childNodes = mirror.childNodes;
+                let numbersHTML = '';
+                
+                for (let i = 0; i < childNodes.length; i++) {
+                    const height = childNodes[i].getBoundingClientRect().height;
+                    // Provide the line number, aligned to the top of the wrapping text block
+                    numbersHTML += `<div style="height: ${height}px; display: flex; align-items: flex-start; justify-content: flex-end;">${i + 1}</div>`;
+                }
+                
+                container.innerHTML = numbersHTML;
+            }, 15);
+        };
 
         function updateWordCount(text) {
             const words = text.trim() === '' ? 0 : text.trim().split(/\s+/).length;
@@ -1609,6 +1694,11 @@
             saveVaultLocalOnly(); // Does NOT broadcast content payload to network unnecessarily 
             renderVaultList();
             loadActiveNote();
+            
+            // Clean up any pending navigation toast invites targeted to the note we just navigated to
+            document.querySelectorAll('[id^="toast-nav-"]').forEach(toast => {
+                if (toast.dataset.targetNote === key) toast.remove();
+            });
         }
 
         function createNewNote() {
@@ -1702,7 +1792,7 @@
                 window.broadcastNotePatch(activeNoteKey, oldText, newText);
             }
 
-            renderActiveNote();
+            renderActiveNote(); // Triggers updateLineNumbers & syncing
         }
 
         function handleTitleInput() {
@@ -1879,6 +1969,7 @@
             }
         };
 
+        // Standard auto-disappearing Toast stack logic
         function showToast(message, type = 'info') {
             const container = document.getElementById('toast-container');
             const toast = document.createElement('div');
@@ -1889,6 +1980,64 @@
             setTimeout(() => toast.classList.remove('opacity-0', 'translate-y-2'), 10);
             setTimeout(() => { toast.classList.add('opacity-0', 'translate-y-2'); setTimeout(() => toast.remove(), 300); }, 4000);
         }
+
+        // Custom Peer Navigation Toast module mapping
+        window.showNavigationToast = function(peerId, peerName, targetNoteKey) {
+            const existingId = `toast-nav-${peerId}`;
+            let toast = document.getElementById(existingId);
+            
+            // Override existing navigation toast for this peer rapidly if they're moving
+            if (toast) {
+                clearTimeout(parseInt(toast.dataset.timeoutId));
+                toast.remove();
+            }
+            
+            const targetNoteName = vault[targetNoteKey]?.title || "another note";
+            const container = document.getElementById('toast-container');
+            toast = document.createElement('div');
+            toast.id = existingId;
+            toast.dataset.targetNote = targetNoteKey;
+            toast.className = `p-3.5 rounded-lg shadow-2xl flex flex-col gap-2 text-xs font-semibold transition-all duration-300 transform translate-y-2 opacity-0 select-none bg-obsidian-active text-white border border-obsidian-accent/60 shadow-xl shadow-obsidian-accent/10 z-50`;
+            
+            const msg = currentLang === 'pt-br' ? 
+                `<span class="truncate"><b>${escapeHTML(peerName)}</b> foi para <br><span class="text-obsidian-accent">${escapeHTML(targetNoteName)}</span></span>` : 
+                `<span class="truncate"><b>${escapeHTML(peerName)}</b> moved to <br><span class="text-obsidian-accent">${escapeHTML(targetNoteName)}</span></span>`;
+                
+            const btnLabel = currentLang === 'pt-br' ? 'Acompanhar' : 'Follow';
+                
+            toast.innerHTML = `
+                <div class="flex items-start justify-between gap-4">
+                    <span class="flex items-center gap-3 overflow-hidden"><i class="fa-solid fa-person-walking-arrow-right text-obsidian-accent shrink-0 text-base"></i> <div class="leading-tight">${msg}</div></span>
+                    <button class="text-gray-400 hover:text-white shrink-0 -mt-1 -mr-1 p-1" onclick="this.closest('[id^=toast-nav-]').remove()"><i class="fa-solid fa-times text-sm"></i></button>
+                </div>
+                <button onclick="joinPeerNote('${targetNoteKey}', '${existingId}')" class="w-full py-2 mt-1.5 bg-obsidian-accent hover:bg-obsidian-accentHover text-white rounded transition-colors font-bold tracking-wide uppercase text-[10px]">${btnLabel}</button>
+            `;
+            
+            container.appendChild(toast);
+            
+            setTimeout(() => toast.classList.remove('opacity-0', 'translate-y-2'), 10);
+            
+            // Visible length adjusted to a longer 20-seconds for peer navigations 
+            const timeout = setTimeout(() => {
+                if (document.getElementById(existingId)) {
+                    toast.classList.add('opacity-0', 'translate-y-2'); 
+                    setTimeout(() => toast.remove(), 300);
+                }
+            }, 20000);
+            
+            toast.dataset.timeoutId = timeout;
+        };
+
+        window.joinPeerNote = function(noteKey, toastId) {
+            const toast = document.getElementById(toastId);
+            if (toast) {
+                clearTimeout(parseInt(toast.dataset.timeoutId));
+                toast.remove();
+            }
+            if (vault[noteKey]) {
+                selectNote(noteKey);
+            }
+        };
 
         function getRoadmapMarkdown(lang) {
             if (lang === 'pt-br') {
