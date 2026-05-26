@@ -350,86 +350,59 @@ function parseHybridInline(text) {
 window.updateEditorOverlays = function() {
     const textarea = document.getElementById('markdown-textarea');
     const overlays = document.getElementById('editor-overlays');
-    const preview = document.getElementById('rendered-preview');
+    const hybridBackdrop = document.getElementById('hybrid-backdrop');
     if (!textarea || !overlays) return;
 
     const text = textarea.value;
     const caretPos = textarea.selectionStart;
     const activeLineIndex = text.substring(0, caretPos).split('\n').length - 1;
 
-    // Reset all lines in preview to visible first
-    const renderedLines = preview.querySelectorAll('.rendered-line-block');
-    renderedLines.forEach(el => el.style.visibility = 'visible');
+    if (viewMode === 'hybrid' && hybridBackdrop) {
+        // 1. Reset all backdrop lines to visible
+        const renderedLines = hybridBackdrop.querySelectorAll('.rendered-line-block');
+        renderedLines.forEach(el => {
+            el.style.visibility = 'visible';
+            el.classList.remove('active-edit');
+        });
 
-    if (viewMode === 'hybrid') {
-        const activeRenderedLine = preview.querySelector(`.rendered-line-block[data-line-index="${activeLineIndex}"]`);
+        const activeRenderedLine = hybridBackdrop.querySelector(`.rendered-line-block[data-line-index="${activeLineIndex}"]`);
         
         if (activeRenderedLine) {
-            // 1. Hide the rendered version of the current line
+            // 2. Hide the rendered version of the current line in backdrop
             activeRenderedLine.style.visibility = 'hidden';
+            activeRenderedLine.classList.add('active-edit');
 
-            // 2. Position the "Edit Portal" (the overlay container) over the hidden line
-            // Overlays container becomes the clipping window
-            overlays.style.color = 'inherit';
-            overlays.style.pointerEvents = 'none';
-            overlays.style.backgroundColor = 'transparent';
-            
-            // Adjust overlays size and position to match the exact active line block
+            // 3. Position the "Source Portal" overlay exactly over the gap
             overlays.style.position = 'absolute';
-            overlays.style.top = (activeRenderedLine.offsetTop - preview.scrollTop) + 'px';
-            overlays.style.left = '32px'; // Align with preview max-w mx-auto padding (approx)
-            overlays.style.width = 'calc(100% - 64px)';
+            overlays.style.top = (activeRenderedLine.offsetTop) + 'px';
+            overlays.style.left = activeRenderedLine.offsetLeft + 'px';
+            overlays.style.width = activeRenderedLine.offsetWidth + 'px';
             overlays.style.height = activeRenderedLine.offsetHeight + 'px';
-            overlays.style.overflow = 'hidden';
             overlays.style.zIndex = '45';
-            overlays.innerHTML = ''; // Empty overlay text in hybrid mode
-
-            // 3. Align the textarea within this portal
-            // We shift the textarea UP so that its active line aligns with the portal's top
-            const textareaLineHeight = 24; // Match leading-6 (1.5rem * 16px)
-            const textareaOffset = -(activeLineIndex * textareaLineHeight) - 16; // 16px is textarea padding-top
+            overlays.style.display = 'flex';
+            overlays.style.alignItems = 'center';
+            overlays.style.color = '#e2e8f0'; 
+            overlays.style.backgroundColor = 'transparent';
+            overlays.style.pointerEvents = 'none';
+            overlays.style.opacity = '1';
             
-            textarea.style.top = textareaOffset + 'px';
-            textarea.style.left = '16px'; // Align horizontal
-            textarea.style.width = 'calc(100% - 32px)';
-            textarea.style.color = '#e2e8f0'; // Make text visible for editing
-            textarea.style.backgroundColor = 'transparent';
-            textarea.style.zIndex = '50';
-            textarea.style.pointerEvents = 'auto';
+            const rawLine = text.split('\n')[activeLineIndex] || '';
+            overlays.innerHTML = `<div class="font-mono text-sm leading-6 w-full whitespace-pre-wrap break-words border-l-2 border-obsidian-accent/30 pl-2 bg-obsidian-active/20 rounded-r">${escapeHTML(rawLine)}</div>`;
             
-            // Ensure caret is visible
+            // Textarea is invisible input layer on top
+            textarea.style.color = 'transparent';
             textarea.style.caretColor = 'var(--accent-color)';
         }
     } else {
-        // Fallback for Edit mode or Split mode: standard behavior
-        textarea.style.top = '0';
-        textarea.style.left = '0';
-        textarea.style.width = '100%';
+        // Fallback for Edit mode
         textarea.style.color = '#e2e8f0';
-        textarea.style.pointerEvents = 'auto';
+        overlays.style.opacity = '0';
+        overlays.innerHTML = '';
         
-        overlays.style.position = 'absolute';
-        overlays.style.inset = '0';
-        overlays.style.height = '100%';
-        overlays.style.width = '100%';
-        overlays.style.top = '0';
-        overlays.style.left = '0';
-        overlays.style.color = 'transparent'; // Standard overlay logic
-        
-        // Render traditional overlay for Edit mode
-        const lines = text.split('\n');
-        let finalHTML = '';
-        lines.forEach((line, index) => {
-            const isActive = index === activeLineIndex && document.activeElement === textarea;
-            let rawLine = escapeHTML(line);
-            rawLine = rawLine.replace(/\|\|(.*?)\|\|/g, (match) => {
-                if (isActive) return `<span class="border border-obsidian-accent/50 rounded px-0.5 text-gray-200 bg-obsidian-active/30">${match}</span>`;
-                return `<span class="bg-neutral-900 text-neutral-900 rounded border border-neutral-700 select-none">${match}</span>`;
-            });
-            finalHTML += `<div><span class="text-gray-200">${rawLine}</span></div>`;
-        });
-        overlays.innerHTML = finalHTML;
-        overlays.scrollTop = textarea.scrollTop;
+        if (hybridBackdrop) {
+            const renderedLines = hybridBackdrop.querySelectorAll('.rendered-line-block');
+            renderedLines.forEach(el => el.style.visibility = 'visible');
+        }
     }
 };
 
@@ -439,23 +412,32 @@ function syncScroll(source) {
 
     const textarea = document.getElementById('markdown-textarea');
     const preview = document.getElementById('preview-container');
+    const hybridBackdrop = document.getElementById('hybrid-backdrop');
     const lineNumbers = document.getElementById('line-numbers');
 
     if (source === 'editor') {
-        const pct = textarea.scrollTop / (textarea.scrollHeight - textarea.clientHeight);
-        if (preview.scrollHeight > preview.clientHeight) {
-            preview.scrollTop = pct * (preview.scrollHeight - preview.clientHeight);
+        const scrollTop = textarea.scrollTop;
+        const scrollHeight = textarea.scrollHeight;
+        const clientHeight = textarea.clientHeight;
+        const pct = scrollTop / (scrollHeight - clientHeight);
+        
+        if (viewMode === 'hybrid' && hybridBackdrop) {
+            // 1:1 scroll sync for Hybrid mode backdrop
+            hybridBackdrop.scrollTop = scrollTop;
+        } else {
+            if (preview && preview.scrollHeight > preview.clientHeight) {
+                preview.scrollTop = pct * (preview.scrollHeight - preview.clientHeight);
+            }
         }
-        lineNumbers.scrollTop = textarea.scrollTop;
+        if (lineNumbers) lineNumbers.scrollTop = scrollTop;
     } else {
         if (viewMode !== 'hybrid') {
             const pct = preview.scrollTop / (preview.scrollHeight - preview.clientHeight);
             textarea.scrollTop = pct * (textarea.scrollHeight - textarea.clientHeight);
         }
-        lineNumbers.scrollTop = textarea.scrollTop;
+        if (lineNumbers) lineNumbers.scrollTop = textarea.scrollTop;
     }
     
-    // Always refresh overlays on scroll
     if (window.updateEditorOverlays) window.updateEditorOverlays();
 
     setTimeout(() => { isScrolling = false; }, 50);
