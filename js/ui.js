@@ -153,23 +153,45 @@ function setViewMode(mode) {
     const editor = document.getElementById('editor-container');
     const preview = document.getElementById('preview-container');
     const splitter = document.getElementById('pane-splitter');
+    const hybridBackdrop = document.getElementById('hybrid-backdrop');
+    const textarea = document.getElementById('markdown-textarea');
     
     ['btn-edit-mode', 'btn-hybrid-mode', 'btn-reading-mode', 'btn-split-mode'].forEach(id => {
-        document.getElementById(id).className = "px-2.5 py-1 text-xs font-medium rounded transition-colors text-obsidian-textMuted hover:text-white";
+        const el = document.getElementById(id);
+        if (el) el.className = "px-2.5 py-1 text-xs font-medium rounded transition-colors text-obsidian-textMuted hover:text-white";
     });
+
+    // Reset base styles
+    if (textarea) {
+        textarea.style.color = '#e2e8f0';
+        textarea.style.top = '0';
+    }
+    if (hybridBackdrop) {
+        hybridBackdrop.style.opacity = '0';
+        hybridBackdrop.classList.add('pointer-events-none');
+    }
 
     if (mode === 'edit') {
         editor.classList.remove('hidden'); preview.classList.add('hidden'); splitter.classList.add('hidden');
-        document.getElementById('btn-edit-mode').classList.add('bg-obsidian-active', 'text-white');
+        const btn = document.getElementById('btn-edit-mode');
+        if (btn) btn.classList.add('bg-obsidian-active', 'text-white');
     } else if (mode === 'hybrid') {
         editor.classList.remove('hidden'); preview.classList.add('hidden'); splitter.classList.add('hidden');
-        document.getElementById('btn-hybrid-mode').classList.add('bg-obsidian-active', 'text-obsidian-accent');
+        if (hybridBackdrop) {
+            hybridBackdrop.style.opacity = '1';
+            hybridBackdrop.classList.remove('pointer-events-none');
+        }
+        if (textarea) textarea.style.color = 'transparent';
+        const btn = document.getElementById('btn-hybrid-mode');
+        if (btn) btn.classList.add('bg-obsidian-active', 'text-obsidian-accent');
     } else if (mode === 'reading') {
         editor.classList.add('hidden'); preview.classList.remove('hidden'); splitter.classList.add('hidden');
-        document.getElementById('btn-reading-mode').classList.add('bg-obsidian-active', 'text-white');
+        const btn = document.getElementById('btn-reading-mode');
+        if (btn) btn.classList.add('bg-obsidian-active', 'text-white');
     } else {
         editor.classList.remove('hidden'); preview.classList.remove('hidden'); splitter.classList.remove('hidden');
-        document.getElementById('btn-split-mode').classList.add('bg-obsidian-active', 'text-obsidian-accent');
+        const btn = document.getElementById('btn-split-mode');
+        if (btn) btn.classList.add('bg-obsidian-active', 'text-obsidian-accent');
     }
     
     if (window.updateEditorOverlays) window.updateEditorOverlays();

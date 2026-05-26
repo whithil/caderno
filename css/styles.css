@@ -166,14 +166,28 @@ body {
 }
 
 #markdown-textarea {
-    caret-color: #e2e8f0;
-    color: transparent !important; /* Managed by JS in different modes */
-    transition: top 0.05s ease-out; /* Smooth follow */
+    caret-color: var(--accent-color);
+    color: transparent; /* Controlled via JS per mode */
+    transition: top 0.08s ease-out; /* Smooth follow */
+}
+
+.hybrid-backdrop {
+    position: absolute;
+    inset: 0;
+    padding: 1rem; /* Match textarea p-4 */
+    pointer-events: none;
+    z-index: 5;
+    opacity: 0;
+    transition: opacity 0.3s ease;
 }
 
 .rendered-line-block {
     position: relative;
     width: 100%;
+}
+
+.rendered-line-block.active-edit {
+    visibility: hidden;
 }
 
 /* Used for overlay masking inside the textarea view */

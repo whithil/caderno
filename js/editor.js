@@ -206,8 +206,12 @@ function renderActiveNote() {
     const note = vault[activeNoteKey];
     if (!note) return;
 
+    const markdownHTML = renderMarkdown(note.content);
     const preview = document.getElementById('rendered-preview');
-    preview.innerHTML = renderMarkdown(note.content);
+    if (preview) preview.innerHTML = markdownHTML;
+
+    const hybridBackdrop = document.getElementById('hybrid-backdrop');
+    if (hybridBackdrop) hybridBackdrop.innerHTML = markdownHTML;
 
     if (window.updateLineNumbers) window.updateLineNumbers();
     if (window.updateEditorOverlays) window.updateEditorOverlays();

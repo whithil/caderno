@@ -295,7 +295,10 @@
                             <!-- Masking Overlay Engine for Editor (Spoilers & Mentions) -->
                             <div id="editor-overlays" class="absolute inset-0 p-4 font-mono text-sm leading-6 whitespace-pre-wrap break-words pointer-events-none z-10 overflow-hidden text-transparent" aria-hidden="true"></div>
                             
-                            <textarea id="markdown-textarea" onscroll="handleEditorScroll()" onkeydown="handleEditorKeyDown(event)" oninput="handleSourceInput()" onkeyup="reportCursorMove()" onclick="reportCursorMove()" class="absolute inset-0 bg-transparent text-gray-200 p-4 outline-none resize-none font-mono text-sm leading-6 overflow-y-auto block w-full z-20" placeholder="Start writing markdown content..."></textarea>
+                            <!-- High-Fidelity Backdrop for Hybrid Mode -->
+                            <div id="hybrid-backdrop" class="markdown-preview hybrid-backdrop font-sans text-sm leading-relaxed overflow-hidden" aria-hidden="true"></div>
+
+                            <textarea id="markdown-textarea" onscroll="handleEditorScroll()" onkeydown="handleEditorKeyDown(event)" oninput="handleSourceInput()" onkeyup="reportCursorMove()" onclick="reportCursorMove()" class="absolute inset-0 bg-transparent p-4 outline-none resize-none font-mono text-sm leading-6 overflow-y-auto block w-full z-20" placeholder="Start writing markdown content..."></textarea>
                             
                             <!-- Network Cursors Layer -->
                             <div id="editor-cursors-layer" class="absolute inset-0 pointer-events-none overflow-hidden z-30"></div>
