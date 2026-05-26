@@ -202,6 +202,10 @@
             border: 1px solid #3f3f46;
         }
         
+        #editor-overlays div {
+            min-height: 1.5rem; /* Match leading-6 */
+        }
+        
         /* Used for overlay masking inside the textarea view */
         .editor-spoiler {
             transition: all 0.2s ease;
@@ -256,96 +260,115 @@
                 </div>
             </a>
         </div>
+
+        <!-- Middle Quick Search -->
+        <div class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 hidden lg:block w-full max-w-sm">
+            <button onclick="openCommandPalette()" class="w-full px-3 py-1.5 bg-obsidian-bg border border-obsidian-border text-xs text-obsidian-textMuted rounded-lg hover:bg-obsidian-active hover:text-white transition-all flex items-center justify-between gap-2" title="Quick Search">
+                <div class="flex items-center gap-2">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                    <span id="quick-search-text">Quick Search</span>
+                </div>
+                <kbd class="bg-obsidian-sidebar px-1.5 py-0.5 rounded text-[9px] border border-neutral-700 font-mono">Ctrl P</kbd>
+            </button>
+        </div>
         
-        <div class="flex items-center gap-1.5 sm:gap-2 lg:gap-3 shrink-0">
-            <!-- Mentions Button Indicator -->
-            <div class="relative shrink-0 select-none">
-                <button id="btn-mentions-bell" onclick="toggleMentionsDropdown(event)" class="px-2 py-1.5 hover:bg-obsidian-active rounded transition-all border border-obsidian-border/50 flex items-center gap-1.5 relative" title="Mentions / Menções">
-                    <i class="fa-solid fa-at text-obsidian-accent"></i>
-                    <span id="mention-badge" class="hidden absolute -top-1 -right-1 bg-red-500 text-[9px] font-bold text-white h-4 w-4 rounded-full flex items-center justify-center animate-bounce">0</span>
-                </button>
-                <div id="mentions-dropdown" class="absolute right-0 mt-1.5 bg-obsidian-sidebar border border-obsidian-border rounded-lg shadow-xl py-2 w-64 hidden z-50">
-                    <div class="px-3 py-1.5 border-b border-obsidian-border flex items-center justify-between">
-                        <span class="text-[11px] font-bold uppercase tracking-wider text-white">Menções Recebidas</span>
-                        <button onclick="clearMentions()" class="text-[9px] text-red-400 hover:underline">Limpar</button>
-                    </div>
-                    <div id="mentions-list" class="max-h-48 overflow-y-auto p-1 divide-y divide-neutral-800">
-                        <p class="text-[11px] text-neutral-500 italic text-center py-4">Nenhuma menção ainda.</p>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Profile Settings Button -->
-            <button onclick="openProfileModal()" class="px-2 py-1.5 hover:bg-obsidian-active rounded transition-all border border-obsidian-border/50 flex items-center gap-1.5 shrink-0" title="Profile / Perfil">
-                <i class="fa-solid fa-user text-obsidian-accent"></i>
-                <span id="profile-btn-text" class="text-[10px] font-bold text-gray-300 uppercase tracking-wider font-mono hidden md:inline">Profile</span>
-            </button>
-
-            <!-- Toggle Personal Cursor Label Option -->
-            <button onclick="toggleOwnCursorFlag()" class="px-2 py-1.5 hover:bg-obsidian-active rounded transition-all border border-obsidian-border/50 flex items-center gap-1.5 shrink-0" title="Ver próprio nome no cursor">
-                <i id="btn-own-cursor-icon" class="fa-solid fa-toggle-off text-neutral-500"></i>
-                <span class="text-[10px] font-bold text-gray-300 uppercase tracking-wider font-mono hidden md:inline">Meu Cursor</span>
-            </button>
-
-            <!-- Git Blame Mode Toggle -->
-            <button onclick="toggleBlameMode()" id="btn-blame-toggle" class="px-2 py-1.5 hover:bg-obsidian-active rounded transition-all border border-obsidian-border/50 flex items-center gap-1.5 shrink-0" title="Ver autores de cada trecho (Git Blame)">
-                <i class="fa-solid fa-code-branch text-neutral-400"></i>
-                <span class="text-[10px] font-bold text-gray-300 uppercase tracking-wider font-mono hidden md:inline">Blame</span>
-            </button>
-
-            <!-- Language Switcher -->
-            <button onclick="toggleLanguage()" class="px-2 py-1.5 hover:bg-obsidian-active rounded transition-all border border-obsidian-border/50 flex items-center gap-1.5 shrink-0" title="Change Language / Alterar Idioma">
-                <span id="active-flag-container" class="flex items-center"></span>
-                <span id="active-lang-code" class="text-[10px] font-bold text-gray-300 uppercase tracking-wider font-mono hidden md:inline">EN</span>
-            </button>
-
-            <!-- Theme Accent Selector Dropdown -->
-            <div class="relative shrink-0 select-none">
-                <button id="btn-theme-picker" onclick="toggleThemeDropdown(event)" class="px-2 py-1.5 hover:bg-obsidian-active rounded transition-all border border-obsidian-border/50 flex items-center gap-1.5" title="Change Theme / Mudar Tema">
-                    <i class="fa-solid fa-palette text-obsidian-accent"></i>
-                    <span class="text-[10px] font-bold text-gray-300 uppercase tracking-wider font-mono hidden md:inline">Theme</span>
-                </button>
-                <div id="theme-dropdown" class="absolute right-0 mt-1.5 bg-obsidian-sidebar border border-obsidian-border rounded-lg shadow-xl py-2 w-32 hidden z-50">
-                    <button onclick="changeTheme('purple')" class="w-full text-left px-3 py-1.5 text-xs text-gray-300 hover:bg-obsidian-active hover:text-white flex items-center gap-2 transition-colors">
-                        <span class="w-2.5 h-2.5 rounded-full bg-purple-500"></span> Purple
-                    </button>
-                    <button onclick="changeTheme('emerald')" class="w-full text-left px-3 py-1.5 text-xs text-gray-300 hover:bg-obsidian-active hover:text-white flex items-center gap-2 transition-colors">
-                        <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span> Emerald
-                    </button>
-                    <button onclick="changeTheme('indigo')" class="w-full text-left px-3 py-1.5 text-xs text-gray-300 hover:bg-obsidian-active hover:text-white flex items-center gap-2 transition-colors">
-                        <span class="w-2.5 h-2.5 rounded-full bg-indigo-500"></span> Indigo
-                    </button>
-                    <button onclick="changeTheme('amber')" class="w-full text-left px-3 py-1.5 text-xs text-gray-300 hover:bg-obsidian-active hover:text-white flex items-center gap-2 transition-colors">
-                        <span class="w-2.5 h-2.5 rounded-full bg-amber-500"></span> Amber
-                    </button>
-                    <button onclick="changeTheme('rose')" class="w-full text-left px-3 py-1.5 text-xs text-gray-300 hover:bg-obsidian-active hover:text-white flex items-center gap-2 transition-colors">
-                        <span class="w-2.5 h-2.5 rounded-full bg-rose-500"></span> Rose
-                    </button>
-                </div>
-            </div>
-
-            <!-- Collaboration Info status -->
-            <div id="collab-status-container" class="hidden sm:flex items-center gap-2 px-2 lg:px-3 py-1 bg-obsidian-bg/50 border border-obsidian-border rounded-lg text-xs shrink-0" title="Collaboration Status">
-                <div class="flex items-center gap-1.5">
+        <div class="flex items-center gap-1.5 sm:gap-2 shrink-0">
+            <!-- Collaboration Info status & User Menu -->
+            <div id="collab-status-container" class="flex items-center gap-2 px-2 py-1 bg-obsidian-bg/50 border border-obsidian-border rounded-lg text-xs shrink-0 relative group cursor-pointer" title="Collaboration & Profile">
+                <div class="flex items-center gap-2" onclick="toggleUserMenu(event)">
                     <span class="relative flex h-2 w-2">
                         <span id="presence-pulse" class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
                         <span id="presence-indicator" class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
                     </span>
-                    <span id="collab-status-text" class="text-neutral-400 font-medium hidden lg:inline">Connecting live...</span>
+                    <div id="presence-avatars" class="flex items-center -space-x-1.5 overflow-hidden"></div>
+                    <span id="collab-status-text" class="hidden"></span>
+                    <i class="fa-solid fa-chevron-down text-[10px] text-neutral-500 group-hover:text-white transition-colors"></i>
                 </div>
-                <div class="h-3 w-[1px] bg-obsidian-border hidden lg:block"></div>
-                <div id="presence-avatars" class="flex items-center -space-x-1.5 overflow-hidden"></div>
+
+                <!-- User Submenu -->
+                <div id="user-dropdown" class="absolute right-0 top-full mt-1.5 bg-obsidian-sidebar border border-obsidian-border rounded-lg shadow-xl py-2 w-48 hidden z-50">
+                    <div class="px-3 py-1.5 border-b border-obsidian-border">
+                        <span class="text-[11px] font-bold uppercase tracking-wider text-neutral-500">Collaborator</span>
+                    </div>
+                    <button onclick="openProfileModal()" class="w-full text-left px-3 py-2 text-xs text-gray-300 hover:bg-obsidian-active hover:text-white flex items-center gap-2 transition-colors">
+                        <i class="fa-solid fa-user-gear text-obsidian-accent"></i> My Profile
+                    </button>
+                    <button onclick="shareSessionLink()" class="w-full text-left px-3 py-2 text-xs text-gray-300 hover:bg-obsidian-active hover:text-white flex items-center gap-2 transition-colors lg:hidden">
+                        <i class="fa-solid fa-share-nodes text-obsidian-accent"></i> Share Session
+                    </button>
+                    <div class="px-3 py-1.5 border-t border-b border-obsidian-border mt-1">
+                        <span class="text-[11px] font-bold uppercase tracking-wider text-neutral-500">Mentions</span>
+                    </div>
+                    <div id="mentions-list-mini" class="max-h-32 overflow-y-auto px-1 py-1">
+                        <!-- Mentions populated via JS -->
+                    </div>
+                    <button onclick="clearMentions()" class="w-full text-center py-1.5 text-[10px] text-red-400 hover:underline">Clear Mentions</button>
+                </div>
             </div>
 
-            <button onclick="shareSessionLink()" class="px-2 py-1.5 lg:px-3 bg-obsidian-accentBg border border-obsidian-accentBorder text-xs text-obsidian-accentMuted rounded hover:bg-obsidian-accent hover:text-white transition-all flex items-center gap-1.5 font-semibold shrink-0" title="Share Session Link">
+            <!-- Share Button (Top Level) -->
+            <button onclick="shareSessionLink()" class="hidden lg:flex px-3 py-1.5 bg-obsidian-accentBg border border-obsidian-accentBorder text-xs text-obsidian-accentMuted rounded hover:bg-obsidian-accent hover:text-white transition-all items-center gap-1.5 font-semibold shrink-0" title="Share Session Link">
                 <i class="fa-solid fa-share-nodes"></i>
-                <span id="share-btn-text" class="hidden lg:inline">Share Live Session</span>
+                <span id="share-btn-text">Share Live Session</span>
             </button>
 
-            <button onclick="openCommandPalette()" class="px-2 py-1.5 lg:px-3 bg-obsidian-bg border border-obsidian-border text-xs text-obsidian-textMuted rounded hover:bg-obsidian-active hover:text-white transition-all flex items-center gap-2 shrink-0" title="Quick Search">
+            <!-- Settings COG Menu -->
+            <div class="relative shrink-0 select-none">
+                <button id="btn-settings-cog" onclick="toggleSettingsDropdown(event)" class="p-1.5 hover:bg-obsidian-active rounded transition-all border border-obsidian-border/50 text-neutral-400 hover:text-white flex items-center justify-center" title="Settings / Preferências">
+                    <i class="fa-solid fa-cog text-lg"></i>
+                </button>
+                
+                <div id="settings-dropdown" class="absolute right-0 mt-1.5 bg-obsidian-sidebar border border-obsidian-border rounded-lg shadow-2xl py-2 w-56 hidden z-50">
+                    <div class="px-3 py-1.5 border-b border-obsidian-border flex items-center justify-between">
+                        <span class="text-[11px] font-bold uppercase tracking-wider text-white">Preferências</span>
+                    </div>
+                    
+                    <!-- Language Switcher -->
+                    <button onclick="toggleLanguage()" class="w-full text-left px-3 py-2 text-xs text-gray-300 hover:bg-obsidian-active hover:text-white flex items-center justify-between transition-colors">
+                        <div class="flex items-center gap-2">
+                            <span id="active-flag-container" class="flex items-center"></span>
+                            <span>Language / Idioma</span>
+                        </div>
+                        <span id="active-lang-code" class="text-[10px] font-bold text-obsidian-accent uppercase tracking-wider font-mono">EN</span>
+                    </button>
+
+                    <!-- Theme Accent Selector -->
+                    <div class="px-3 py-2 border-t border-obsidian-border">
+                        <div class="text-[10px] font-bold text-neutral-500 uppercase mb-2">Theme Accent</div>
+                        <div class="flex gap-2">
+                            <button onclick="changeTheme('purple')" class="w-4 h-4 rounded-full bg-purple-500 border border-white/20"></button>
+                            <button onclick="changeTheme('emerald')" class="w-4 h-4 rounded-full bg-emerald-500 border border-white/20"></button>
+                            <button onclick="changeTheme('indigo')" class="w-4 h-4 rounded-full bg-indigo-500 border border-white/20"></button>
+                            <button onclick="changeTheme('amber')" class="w-4 h-4 rounded-full bg-amber-500 border border-white/20"></button>
+                            <button onclick="changeTheme('rose')" class="w-4 h-4 rounded-full bg-rose-500 border border-white/20"></button>
+                        </div>
+                    </div>
+
+                    <div class="border-t border-obsidian-border mt-1 pt-1">
+                        <!-- Toggle Personal Cursor Label Option -->
+                        <button onclick="toggleOwnCursorFlag()" class="w-full text-left px-3 py-2 text-xs text-gray-300 hover:bg-obsidian-active hover:text-white flex items-center justify-between transition-colors">
+                            <div class="flex items-center gap-2">
+                                <i class="fa-solid fa-user-tag w-4"></i>
+                                <span>Show My Name</span>
+                            </div>
+                            <i id="btn-own-cursor-icon" class="fa-solid fa-toggle-off text-neutral-500"></i>
+                        </button>
+
+                        <!-- Git Blame Mode Toggle -->
+                        <button onclick="toggleBlameMode()" id="btn-blame-toggle-cog" class="w-full text-left px-3 py-2 text-xs text-gray-300 hover:bg-obsidian-active hover:text-white flex items-center justify-between transition-colors">
+                            <div class="flex items-center gap-2">
+                                <i class="fa-solid fa-code-branch w-4"></i>
+                                <span>Blame Mode</span>
+                            </div>
+                            <span id="blame-status-label" class="text-[9px] px-1 bg-neutral-800 rounded text-neutral-500">OFF</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Mobile Search Toggle -->
+            <button onclick="openCommandPalette()" class="lg:hidden p-1.5 hover:bg-obsidian-active rounded transition-all border border-obsidian-border/50 text-neutral-400" title="Search">
                 <i class="fa-solid fa-magnifying-glass"></i>
-                <span id="quick-search-text" class="hidden md:inline">Quick Search</span>
-                <kbd class="hidden xl:inline bg-obsidian-sidebar px-1 py-0.5 rounded text-[9px] border border-neutral-700 font-mono">Ctrl P</kbd>
             </button>
 
             <button id="btn-toggle-right" onclick="toggleSidebar('right-sidebar')" class="p-1.5 hover:bg-obsidian-active rounded transition-all border border-transparent shrink-0" title="Toggle Document Outline (Ctrl+Shift+O)">
@@ -421,10 +444,13 @@
                     <button id="btn-edit-mode" onclick="setViewMode('edit')" class="px-2.5 py-1 text-xs font-medium rounded transition-colors text-obsidian-textMuted hover:text-white" title="Markdown Source Mode">
                         <i class="fa-solid fa-code mr-1"></i> Edit
                     </button>
+                    <button id="btn-hybrid-mode" onclick="setViewMode('hybrid')" class="px-2.5 py-1 text-xs font-medium rounded transition-colors text-obsidian-accent bg-obsidian-active" title="Hybrid Edit/Preview Mode">
+                        <i class="fa-solid fa-wand-magic-sparkles mr-1"></i> Hybrid
+                    </button>
                     <button id="btn-reading-mode" onclick="setViewMode('reading')" class="px-2.5 py-1 text-xs font-medium rounded transition-colors text-obsidian-textMuted hover:text-white" title="Fully Rendered Checklist View">
                         <i class="fa-solid fa-book-open mr-1"></i> Reading
                     </button>
-                    <button id="btn-split-mode" onclick="setViewMode('split')" class="px-2.5 py-1 text-xs font-medium rounded transition-colors text-obsidian-accent bg-obsidian-active" title="Split Live Preview">
+                    <button id="btn-split-mode" onclick="setViewMode('split')" class="px-2.5 py-1 text-xs font-medium rounded transition-colors text-obsidian-textMuted hover:text-white" title="Split Live Preview">
                         <i class="fa-solid fa-columns mr-1"></i> Split
                     </button>
                 </div>
@@ -479,7 +505,7 @@
 
                 <div id="pane-splitter" class="w-[1px] bg-obsidian-border h-full relative z-40"></div>
 
-                <div id="preview-container" onscroll="syncScroll('preview')" class="flex-1 overflow-y-auto px-8 py-6 bg-obsidian-bg relative z-40">
+                <div id="preview-container" onscroll="syncScroll('preview')" class="flex-1 overflow-y-auto px-8 py-6 bg-obsidian-bg relative z-40 hidden">
                     <div class="max-w-3xl mx-auto">
                         <div id="rendered-preview" class="markdown-preview pb-16"></div>
                     </div>
@@ -1048,8 +1074,9 @@
             if (localUser.cursorPos !== pos) {
                 localUser.cursorPos = pos;
                 
-                // Immediately refresh local cursors to render "My Cursor" fast
+                // Immediately refresh local cursors and overlays
                 if (window.renderRemoteCursors) window.renderRemoteCursors();
+                if (window.updateEditorOverlays) window.updateEditorOverlays();
                 
                 clearTimeout(cursorMoveTimeout);
                 cursorMoveTimeout = setTimeout(() => {
@@ -1322,6 +1349,7 @@
                 campaignNotes: "My Notes",
                 overallCompletion: "Task Completion",
                 modeEdit: "Edit",
+                modeHybrid: "Hybrid",
                 modeReading: "Reading",
                 modeSplit: "Split",
                 campaignTracker: "Task Progress Tracker",
@@ -1374,6 +1402,7 @@
                 campaignNotes: "Minhas Notas",
                 overallCompletion: "Progresso de Tarefas",
                 modeEdit: "Editar",
+                modeHybrid: "Híbrido",
                 modeReading: "Leitura",
                 modeSplit: "Dividido",
                 campaignTracker: "Rastreador de Tarefas",
@@ -1462,6 +1491,7 @@
             document.getElementById('delete-modal-confirm-btn').innerText = t.delete;
 
             document.getElementById('btn-edit-mode').innerHTML = `<i class="fa-solid fa-code mr-1"></i> ` + t.modeEdit;
+            document.getElementById('btn-hybrid-mode').innerHTML = `<i class="fa-solid fa-wand-magic-sparkles mr-1"></i> ` + t.modeHybrid;
             document.getElementById('btn-reading-mode').innerHTML = `<i class="fa-solid fa-book-open mr-1"></i> ` + t.modeReading;
             document.getElementById('btn-split-mode').innerHTML = `<i class="fa-solid fa-columns mr-1"></i> ` + t.modeSplit;
 
@@ -1510,7 +1540,7 @@
         /* CORE VAULT & APP STATE */
         var vault = {};
         var activeNoteKey = "";
-        let viewMode = "split"; 
+        let viewMode = "hybrid"; 
         let searchFilter = "";
         let isScrolling = false;
         let deleteCandidateKey = null;
@@ -1563,11 +1593,14 @@
             window.initializeVaultState();
             renderVaultList();
             loadActiveNote();
-            setViewMode("split");
+            setViewMode("hybrid");
             window.initP2PEngine();
 
             const textarea = document.getElementById('markdown-textarea');
             if (textarea) {
+                textarea.addEventListener('focus', () => { if (window.updateEditorOverlays) window.updateEditorOverlays(); });
+                textarea.addEventListener('blur', () => { if (window.updateEditorOverlays) window.updateEditorOverlays(); });
+
                 new ResizeObserver(() => {
                     if (window.updateLineNumbers) window.updateLineNumbers();
                     if (window.updateEditorOverlays) window.updateEditorOverlays();
@@ -1952,26 +1985,103 @@
             const overlays = document.getElementById('editor-overlays');
             if (!textarea || !overlays) return;
 
-            let html = escapeHTML(textarea.value);
+            const text = textarea.value;
+            const lines = text.split('\n');
+            const caretPos = textarea.selectionStart;
+            const activeLineIndex = text.substring(0, caretPos).split('\n').length - 1;
+
+            let finalHTML = '';
             
-            // 1. Highlight Mentions visually keeping the text underneath matching
-            html = html.replace(/@([A-Za-z0-9_À-ÿ]+(?: [A-Za-z0-9_À-ÿ]+)?)/g, (match) => {
-                return `<span class="bg-obsidian-accent/20 border-b border-obsidian-accent/50 text-transparent rounded px-0.5">${match}</span>`;
+            lines.forEach((line, index) => {
+                const isActive = index === activeLineIndex && document.activeElement === textarea;
+                let lineHTML = '';
+
+                if (viewMode === 'hybrid' && !isActive) {
+                    // In Hybrid mode, parse inactive lines but keep them single-line for alignment
+                    lineHTML = parseHybridLine(line);
+                } else {
+                    // Raw mode or active line: show raw text but handle mentions/spoilers specifically
+                    lineHTML = escapeHTML(line);
+                    
+                    // Highlight Mentions
+                    lineHTML = lineHTML.replace(/@([A-Za-z0-9_À-ÿ]+(?: [A-Za-z0-9_À-ÿ]+)?)/g, (match) => {
+                        return `<span class="bg-obsidian-accent/20 border-b border-obsidian-accent/50 text-transparent rounded px-0.5">${match}</span>`;
+                    });
+
+                    // Mask/Hide Spoilers on inactive lines
+                    lineHTML = lineHTML.replace(/\|\|(.*?)\|\|/g, (match) => {
+                        if (isActive) {
+                            // On active line, show markers but don't mask content
+                            return `<span class="border border-obsidian-accent/30 rounded px-0.5 text-transparent">${match}</span>`;
+                        } else {
+                            // On inactive lines, mask content
+                            const title = currentLang === 'pt-br' ? 'Spoiler: Ative a linha para editar' : 'Spoiler: Activate line to edit';
+                            return `<span class="bg-neutral-900 text-neutral-900 rounded border border-neutral-700 select-none" title="${title}">${match}</span>`;
+                        }
+                    });
+                }
+
+                finalHTML += `<div>${lineHTML || '&#8203;'}</div>`;
             });
 
-            // 2. Block/mask Spoilers dynamically
-            html = html.replace(/\|\|(.*?)\|\|/g, (match) => {
-                const title = currentLang === 'pt-br' ? 'Spoiler: Clique para revelar' : 'Spoiler: Click to reveal';
-                return `<span class="editor-spoiler bg-neutral-900 text-neutral-900 pointer-events-auto cursor-pointer rounded border border-neutral-700 select-none transition-colors" onclick="this.classList.toggle('bg-neutral-900'); this.classList.toggle('text-neutral-900'); this.classList.toggle('bg-transparent'); this.classList.toggle('text-transparent');" title="${title}">${match}</span>`;
-            });
-
-            if (textarea.value.endsWith('\n')) {
-                html += '<br/>';
-            }
-
-            overlays.innerHTML = html;
+            overlays.innerHTML = finalHTML;
             overlays.scrollTop = textarea.scrollTop;
         };
+
+        function parseHybridLine(line) {
+            if (!line.trim()) return '&#8203;';
+            
+            // Priority 1: Headers (styled to match line height)
+            if (line.startsWith('# ')) {
+                return `<span class="text-white font-bold border-b border-obsidian-border pb-0.5">${escapeHTML(line.slice(2))}</span>`;
+            } else if (line.startsWith('## ')) {
+                return `<span class="text-white font-bold">${escapeHTML(line.slice(3))}</span>`;
+            } else if (line.startsWith('### ')) {
+                return `<span class="text-gray-300 font-bold">${escapeHTML(line.slice(4))}</span>`;
+            }
+
+            // Priority 2: Checkboxes
+            const checkboxRegex = /^(\s*)-\s*\[([ xX])\]\s*(.*)$/;
+            const checkboxMatch = line.match(checkboxRegex);
+            if (checkboxMatch) {
+                const isChecked = checkboxMatch[2].toLowerCase() === 'x';
+                const content = parseHybridInline(checkboxMatch[3]);
+                return `<span class="inline-flex items-center gap-1.5"><span class="w-3.5 h-3.5 rounded border border-neutral-500 flex items-center justify-center ${isChecked ? 'bg-obsidian-accent border-obsidian-accent' : ''}">${isChecked ? '<i class="fa-solid fa-check text-[8px] text-white"></i>' : ''}</span> <span class="${isChecked ? 'line-through text-neutral-500' : 'text-gray-300'}">${content}</span></span>`;
+            }
+
+            // Priority 3: Bullets
+            const bulletRegex = /^(\s*)-\s*(.*)$/;
+            const bulletMatch = line.match(bulletRegex);
+            if (bulletMatch) {
+                const content = parseHybridInline(bulletMatch[2]);
+                return `<span class="inline-flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-obsidian-accent"></span> <span class="text-gray-300">${content}</span></span>`;
+            }
+
+            return parseHybridInline(line);
+        }
+
+        function parseHybridInline(text) {
+            let parsed = escapeHTML(text);
+            
+            // Spoilers (always masked on inactive lines in hybrid)
+            parsed = parsed.replace(/\|\|(.*?)\|\|/g, `<span class="bg-neutral-900 text-neutral-900 rounded border border-neutral-700 select-none">||$1||</span>`);
+            
+            parsed = parsed.replace(/\*\*(.*?)\*\*/g, '<strong class="font-bold text-white">$1</strong>');
+            parsed = parsed.replace(/\*(.*?)\*/g, '<em class="italic">$1</em>');
+            parsed = parsed.replace(/==(.*?)==/g, '<mark class="bg-purple-900/40 text-purple-300 px-1 rounded">$1</mark>');
+            parsed = parsed.replace(/`(.*?)`/g, '<code class="bg-neutral-800 border border-neutral-700 px-1 rounded text-purple-300">$1</code>');
+            
+            // Mentions
+            parsed = parsed.replace(/@([A-Za-z0-9_À-ÿ]+(?: [A-Za-z0-9_À-ÿ]+)?)/g, (match, name) => {
+                let color = 'var(--accent-color)';
+                const peers = [localUser, ...Object.values(remotePeersData)];
+                const found = peers.find(p => p.name === name);
+                if (found) color = found.color;
+                return `<span class="px-1 rounded bg-obsidian-active text-white border-l-2" style="border-color: ${color}">${match}</span>`;
+            });
+
+            return parsed;
+        }
 
         let updateLineNumbersTimeout = null;
         window.updateLineNumbers = function() {
@@ -2367,13 +2477,16 @@
             const preview = document.getElementById('preview-container');
             const splitter = document.getElementById('pane-splitter');
             
-            ['btn-edit-mode', 'btn-reading-mode', 'btn-split-mode'].forEach(id => {
+            ['btn-edit-mode', 'btn-hybrid-mode', 'btn-reading-mode', 'btn-split-mode'].forEach(id => {
                 document.getElementById(id).className = "px-2.5 py-1 text-xs font-medium rounded transition-colors text-obsidian-textMuted hover:text-white";
             });
 
             if (mode === 'edit') {
                 editor.classList.remove('hidden'); preview.classList.add('hidden'); splitter.classList.add('hidden');
                 document.getElementById('btn-edit-mode').classList.add('bg-obsidian-active', 'text-white');
+            } else if (mode === 'hybrid') {
+                editor.classList.remove('hidden'); preview.classList.add('hidden'); splitter.classList.add('hidden');
+                document.getElementById('btn-hybrid-mode').classList.add('bg-obsidian-active', 'text-obsidian-accent');
             } else if (mode === 'reading') {
                 editor.classList.add('hidden'); preview.classList.remove('hidden'); splitter.classList.add('hidden');
                 document.getElementById('btn-reading-mode').classList.add('bg-obsidian-active', 'text-white');
@@ -2381,6 +2494,8 @@
                 editor.classList.remove('hidden'); preview.classList.remove('hidden'); splitter.classList.remove('hidden');
                 document.getElementById('btn-split-mode').classList.add('bg-obsidian-active', 'text-obsidian-accent');
             }
+            
+            if (window.updateEditorOverlays) window.updateEditorOverlays();
         }
 
         function toggleSidebar(id) {
@@ -2614,41 +2729,76 @@
             }
         };
 
+        window.toggleSettingsDropdown = function(event) {
+            if (event) event.stopPropagation();
+            const dropdown = document.getElementById('settings-dropdown');
+            const userDropdown = document.getElementById('user-dropdown');
+            if (userDropdown) userDropdown.classList.add('hidden');
+            if (dropdown) dropdown.classList.toggle('hidden');
+        };
+
+        window.toggleUserMenu = function(event) {
+            if (event) event.stopPropagation();
+            const dropdown = document.getElementById('user-dropdown');
+            const settingsDropdown = document.getElementById('settings-dropdown');
+            if (settingsDropdown) settingsDropdown.classList.add('hidden');
+            if (dropdown) dropdown.classList.toggle('hidden');
+        };
+
+        window.addEventListener('click', function(e) {
+            const settingsDropdown = document.getElementById('settings-dropdown');
+            const userDropdown = document.getElementById('user-dropdown');
+            const cogBtn = document.getElementById('btn-settings-cog');
+            const userBtn = document.getElementById('collab-status-container');
+            
+            if (settingsDropdown && cogBtn && !cogBtn.contains(e.target) && !settingsDropdown.contains(e.target)) {
+                settingsDropdown.classList.add('hidden');
+            }
+            if (userDropdown && userBtn && !userBtn.contains(e.target) && !userDropdown.contains(e.target)) {
+                userDropdown.classList.add('hidden');
+            }
+        });
+
         function updateMentionsUI() {
             const unreadCount = userMentions.filter(m => !m.read).length;
             const badge = document.getElementById('mention-badge');
-            if (unreadCount > 0) {
-                badge.innerText = unreadCount;
-                badge.classList.remove('hidden');
-            } else {
-                badge.classList.add('hidden');
+            if (badge) {
+                if (unreadCount > 0) {
+                    badge.innerText = unreadCount;
+                    badge.classList.remove('hidden');
+                } else {
+                    badge.classList.add('hidden');
+                }
             }
 
-            const listContainer = document.getElementById('mentions-list');
+            const listContainer = document.getElementById('mentions-list-mini');
+            if (!listContainer) return;
+
             if (userMentions.length === 0) {
-                listContainer.innerHTML = `<p class="text-[11px] text-neutral-500 italic text-center py-4">Nenhuma menção recebida.</p>`;
+                listContainer.innerHTML = `<p class="text-[9px] text-neutral-500 italic text-center py-4">No mentions yet.</p>`;
                 return;
             }
 
             listContainer.innerHTML = '';
             userMentions.forEach((m, idx) => {
                 const item = document.createElement('div');
-                item.className = `p-2 hover:bg-obsidian-active cursor-pointer transition-colors flex flex-col gap-0.5 ${!m.read ? 'border-l-2 border-obsidian-accent' : ''}`;
+                item.className = `p-1.5 hover:bg-obsidian-active cursor-pointer transition-colors flex flex-col gap-0.5 rounded ${!m.read ? 'bg-obsidian-accentBg/30 border-l-2 border-obsidian-accent' : ''}`;
                 item.onclick = () => {
                     m.read = true;
                     saveVaultLocalOnly();
                     updateMentionsUI();
                     selectNote(m.noteKey);
-                    document.getElementById('mentions-dropdown').classList.add('hidden');
+                    const dropdown = document.getElementById('user-dropdown');
+                    if (dropdown) dropdown.classList.add('hidden');
                 };
                 
                 const dateStr = new Date(m.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
                 item.innerHTML = `
-                    <div class="flex justify-between text-[10px] text-neutral-400">
+                    <div class="flex justify-between text-[9px] text-neutral-400">
                         <span class="font-bold text-gray-200">@${escapeHTML(m.authorName)}</span>
                         <span>${dateStr}</span>
                     </div>
-                    <span class="text-[11px] text-gray-300 truncate">Mencionou você em: <span class="text-obsidian-accent font-semibold">${escapeHTML(m.text)}</span></span>
+                    <span class="text-[10px] text-gray-300 truncate">${escapeHTML(m.text)}</span>
                 `;
                 listContainer.appendChild(item);
             });
@@ -2664,9 +2814,9 @@
             ownCursorFlagEnabled = !ownCursorFlagEnabled;
             const icon = document.getElementById('btn-own-cursor-icon');
             if (ownCursorFlagEnabled) {
-                icon.className = "fa-solid fa-toggle-on text-obsidian-accent";
+                if (icon) icon.className = "fa-solid fa-toggle-on text-obsidian-accent";
             } else {
-                icon.className = "fa-solid fa-toggle-off text-neutral-500";
+                if (icon) icon.className = "fa-solid fa-toggle-off text-neutral-500";
             }
             
             // Force cursor position sync & render
@@ -2677,11 +2827,15 @@
 
         window.toggleBlameMode = function() {
             blameModeEnabled = !blameModeEnabled;
-            const btn = document.getElementById('btn-blame-toggle');
+            const label = document.getElementById('blame-status-label');
+            const btnCog = document.getElementById('btn-blame-toggle-cog');
+            
             if (blameModeEnabled) {
-                btn.className = "px-2 py-1.5 bg-obsidian-active rounded transition-all border border-obsidian-border text-obsidian-accent font-bold";
+                if (label) { label.innerText = 'ON'; label.className = "text-[9px] px-1 bg-obsidian-accent rounded text-white font-bold"; }
+                if (btnCog) btnCog.classList.add('bg-obsidian-active');
             } else {
-                btn.className = "px-2 py-1.5 hover:bg-obsidian-active rounded transition-all border border-obsidian-border/50 flex items-center gap-1.5 shrink-0";
+                if (label) { label.innerText = 'OFF'; label.className = "text-[9px] px-1 bg-neutral-800 rounded text-neutral-500"; }
+                if (btnCog) btnCog.classList.remove('bg-obsidian-active');
             }
             renderActiveNote();
         };
