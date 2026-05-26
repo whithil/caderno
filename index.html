@@ -175,6 +175,32 @@
             word-wrap: break-word;
             overflow-wrap: break-word;
         }
+        /* Git Blame Highlights styling */
+        .blame-highlight {
+            border-radius: 2px;
+            transition: background-color 0.3s ease;
+        }
+
+        /* Spoiler Markdown Styles */
+        .markdown-spoiler {
+            background-color: #0f0f12;
+            color: #0f0f12;
+            cursor: pointer;
+            border-radius: 4px;
+            padding: 1px 5px;
+            transition: background-color 0.2s ease, color 0.2s ease;
+            user-select: none;
+            border: 1px dashed #2d2d35;
+        }
+        .markdown-spoiler:hover {
+            border-color: var(--accent-color);
+        }
+        .markdown-spoiler.revealed {
+            background-color: rgba(255, 255, 255, 0.08);
+            color: #f1f5f9;
+            user-select: text;
+            border: 1px solid #3f3f46;
+        }
     </style>
     <!-- Dynamic Theme Accelerator -->
     <script>
@@ -224,6 +250,42 @@
         </div>
         
         <div class="flex items-center gap-1.5 sm:gap-2 lg:gap-3 shrink-0">
+            <!-- Mentions Button Indicator -->
+            <div class="relative shrink-0 select-none">
+                <button id="btn-mentions-bell" onclick="toggleMentionsDropdown(event)" class="px-2 py-1.5 hover:bg-obsidian-active rounded transition-all border border-obsidian-border/50 flex items-center gap-1.5 relative" title="Mentions / Menções">
+                    <i class="fa-solid fa-at text-obsidian-accent"></i>
+                    <span id="mention-badge" class="hidden absolute -top-1 -right-1 bg-red-500 text-[9px] font-bold text-white h-4 w-4 rounded-full flex items-center justify-center animate-bounce">0</span>
+                </button>
+                <div id="mentions-dropdown" class="absolute right-0 mt-1.5 bg-obsidian-sidebar border border-obsidian-border rounded-lg shadow-xl py-2 w-64 hidden z-50">
+                    <div class="px-3 py-1.5 border-b border-obsidian-border flex items-center justify-between">
+                        <span class="text-[11px] font-bold uppercase tracking-wider text-white">Menções Recebidas</span>
+                        <button onclick="clearMentions()" class="text-[9px] text-red-400 hover:underline">Limpar</button>
+                    </div>
+                    <div id="mentions-list" class="max-h-48 overflow-y-auto p-1 divide-y divide-neutral-800">
+                        <p class="text-[11px] text-neutral-500 italic text-center py-4">Nenhuma menção ainda.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Profile Settings Button -->
+            <button onclick="openProfileModal()" class="px-2 py-1.5 hover:bg-obsidian-active rounded transition-all border border-obsidian-border/50 flex items-center gap-1.5 shrink-0" title="Profile / Perfil">
+                <i class="fa-solid fa-user text-obsidian-accent"></i>
+                <span id="profile-btn-text" class="text-[10px] font-bold text-gray-300 uppercase tracking-wider font-mono hidden md:inline">Profile</span>
+            </button>
+
+            <!-- Toggle Personal Cursor Label Option -->
+            <button onclick="toggleOwnCursorFlag()" class="px-2 py-1.5 hover:bg-obsidian-active rounded transition-all border border-obsidian-border/50 flex items-center gap-1.5 shrink-0" title="Ver próprio nome no cursor">
+                <i id="btn-own-cursor-icon" class="fa-solid fa-toggle-off text-neutral-500"></i>
+                <span class="text-[10px] font-bold text-gray-300 uppercase tracking-wider font-mono hidden md:inline">Meu Cursor</span>
+            </button>
+
+            <!-- Git Blame Mode Toggle -->
+            <button onclick="toggleBlameMode()" id="btn-blame-toggle" class="px-2 py-1.5 hover:bg-obsidian-active rounded transition-all border border-obsidian-border/50 flex items-center gap-1.5 shrink-0" title="Ver autores de cada trecho (Git Blame)">
+                <i class="fa-solid fa-code-branch text-neutral-400"></i>
+                <span class="text-[10px] font-bold text-gray-300 uppercase tracking-wider font-mono hidden md:inline">Blame</span>
+            </button>
+
+            <!-- Language Switcher -->
             <button onclick="toggleLanguage()" class="px-2 py-1.5 hover:bg-obsidian-active rounded transition-all border border-obsidian-border/50 flex items-center gap-1.5 shrink-0" title="Change Language / Alterar Idioma">
                 <span id="active-flag-container" class="flex items-center"></span>
                 <span id="active-lang-code" class="text-[10px] font-bold text-gray-300 uppercase tracking-wider font-mono hidden md:inline">EN</span>
@@ -254,6 +316,7 @@
                 </div>
             </div>
 
+            <!-- Collaboration Info status -->
             <div id="collab-status-container" class="hidden sm:flex items-center gap-2 px-2 lg:px-3 py-1 bg-obsidian-bg/50 border border-obsidian-border rounded-lg text-xs shrink-0" title="Collaboration Status">
                 <div class="flex items-center gap-1.5">
                     <span class="relative flex h-2 w-2">
@@ -307,6 +370,20 @@
             </div>
 
             <div id="note-list" class="flex-1 overflow-y-auto px-2 space-y-0.5"></div>
+
+            <!-- Import/Export Full OS Backup Workspace Pane -->
+            <div class="p-3 bg-obsidian-bg border-t border-obsidian-border border-b flex flex-col gap-2">
+                <span class="text-[10px] uppercase font-bold text-obsidian-textMuted tracking-wider font-sans">Caderno Backup (Integral)</span>
+                <div class="grid grid-cols-2 gap-2">
+                    <button onclick="exportFullVaultBackup()" class="py-1 px-2 bg-neutral-800 hover:bg-neutral-700 text-[10px] text-white rounded font-semibold border border-neutral-700 flex items-center justify-center gap-1.5 transition-colors">
+                        <i class="fa-solid fa-file-export text-obsidian-accent"></i> Exportar
+                    </button>
+                    <label class="py-1 px-2 bg-neutral-800 hover:bg-neutral-700 text-[10px] text-white rounded font-semibold border border-neutral-700 flex items-center justify-center gap-1.5 cursor-pointer transition-colors text-center">
+                        <i class="fa-solid fa-file-import text-obsidian-accent"></i> Importar
+                        <input type="file" id="file-import-backup" accept=".json" onchange="importFullVaultBackup(event)" class="hidden">
+                    </label>
+                </div>
+            </div>
 
             <div class="p-3 bg-obsidian-bg border-t border-obsidian-border">
                 <div class="flex justify-between items-center text-xs mb-1">
@@ -377,7 +454,10 @@
                     <div class="flex-1 flex overflow-hidden">
                         <div id="line-numbers" class="w-10 text-right pr-2 text-neutral-600 font-mono text-xs select-none py-4 border-r border-obsidian-border bg-obsidian-sidebar/20 shrink-0"></div>
                         <div class="flex-1 relative overflow-hidden flex flex-col">
-                            <textarea id="markdown-textarea" onscroll="handleEditorScroll()" oninput="handleSourceInput()" onkeyup="reportCursorMove()" onclick="reportCursorMove()" class="flex-1 bg-transparent text-gray-200 p-4 outline-none resize-none font-mono text-sm leading-6 overflow-y-auto block w-full" placeholder="Start writing markdown content..."></textarea>
+                            <!-- Mention Dropdown Suggestions -->
+                            <div id="mention-autocomplete" class="absolute left-4 top-10 bg-obsidian-sidebar border border-obsidian-border rounded-lg shadow-2xl p-1 w-48 hidden z-30 divide-y divide-neutral-800"></div>
+                            
+                            <textarea id="markdown-textarea" onscroll="handleEditorScroll()" onkeydown="handleEditorKeyDown(event)" oninput="handleSourceInput()" onkeyup="reportCursorMove()" onclick="reportCursorMove()" class="flex-1 bg-transparent text-gray-200 p-4 outline-none resize-none font-mono text-sm leading-6 overflow-y-auto block w-full" placeholder="Start writing markdown content..."></textarea>
                             <div id="editor-cursors-layer" class="absolute inset-0 pointer-events-none overflow-hidden z-10"></div>
                         </div>
                     </div>
@@ -421,6 +501,44 @@
                 <kbd class="text-[10px] text-neutral-500 bg-obsidian-bg px-1.5 py-0.5 rounded border border-neutral-800 font-mono">ESC</kbd>
             </div>
             <div id="palette-results" class="max-h-80 overflow-y-auto p-2 divide-y divide-neutral-800/40"></div>
+        </div>
+    </div>
+
+    <!-- CUSTOM PROFILE CONFIGURATION MODAL -->
+    <div id="profile-modal" class="fixed inset-0 bg-black/70 backdrop-blur-sm hidden items-center justify-center z-50">
+        <div class="bg-obsidian-sidebar border border-obsidian-border rounded-lg shadow-2xl p-6 max-w-sm w-full mx-4">
+            <h3 id="profile-modal-header" class="text-lg font-bold text-white mb-2">Configure Profile</h3>
+            <p id="profile-modal-desc" class="text-xs text-neutral-400 mb-4">Set your permanent identifier and nickname for this notebook. Changes take effect immediately across all connected peers.</p>
+            
+            <div class="mb-4">
+                <label id="profile-label-nick" class="block text-xs font-bold text-gray-300 mb-1 uppercase tracking-wider">Nickname</label>
+                <input id="profile-nickname-input" type="text" maxlength="25" class="w-full bg-obsidian-bg border border-obsidian-border rounded px-3 py-2 text-sm text-gray-200 outline-none focus:border-obsidian-accent" placeholder="Your name...">
+            </div>
+
+            <div class="mb-6">
+                <label id="profile-label-color" class="block text-xs font-bold text-gray-300 mb-2 uppercase tracking-wider">Cursor & Avatar Color</label>
+                <div class="grid grid-cols-5 gap-2">
+                    <button onclick="selectProfileColor('#a855f7')" class="profile-color-dot h-8 rounded-md border-2 border-transparent relative" style="background-color: #a855f7" data-color="#a855f7"></button>
+                    <button onclick="selectProfileColor('#ec4899')" class="profile-color-dot h-8 rounded-md border-2 border-transparent relative" style="background-color: #ec4899" data-color="#ec4899"></button>
+                    <button onclick="selectProfileColor('#3b82f6')" class="profile-color-dot h-8 rounded-md border-2 border-transparent relative" style="background-color: #3b82f6" data-color="#3b82f6"></button>
+                    <button onclick="selectProfileColor('#10b981')" class="profile-color-dot h-8 rounded-md border-2 border-transparent relative" style="background-color: #10b981" data-color="#10b981"></button>
+                    <button onclick="selectProfileColor('#f59e0b')" class="profile-color-dot h-8 rounded-md border-2 border-transparent relative" style="background-color: #f59e0b" data-color="#f59e0b"></button>
+                    <button onclick="selectProfileColor('#ef4444')" class="profile-color-dot h-8 rounded-md border-2 border-transparent relative" style="background-color: #ef4444" data-color="#ef4444"></button>
+                    <button onclick="selectProfileColor('#06b6d4')" class="profile-color-dot h-8 rounded-md border-2 border-transparent relative" style="background-color: #06b6d4" data-color="#06b6d4"></button>
+                    <button onclick="selectProfileColor('#84cc16')" class="profile-color-dot h-8 rounded-md border-2 border-transparent relative" style="background-color: #84cc16" data-color="#84cc16"></button>
+                    <button onclick="selectProfileColor('#14b8a6')" class="profile-color-dot h-8 rounded-md border-2 border-transparent relative" style="background-color: #14b8a6" data-color="#14b8a6"></button>
+                    <!-- Custom Native Color Picker wrapper -->
+                    <label class="h-8 rounded-md border-2 border-transparent relative cursor-pointer flex items-center justify-center bg-neutral-800 text-xs text-gray-400 font-mono hover:text-white" title="Custom Color">
+                        Custom
+                        <input type="color" id="profile-color-picker" onchange="selectProfileColor(this.value)" class="absolute inset-0 opacity-0 cursor-pointer">
+                    </label>
+                </div>
+            </div>
+
+            <div class="flex justify-end gap-3 border-t border-obsidian-border/50 pt-4">
+                <button onclick="closeProfileModal()" class="px-4 py-2 bg-neutral-800 hover:bg-neutral-700 text-xs font-semibold rounded-md text-white transition-colors">Cancel</button>
+                <button onclick="saveProfile()" class="px-4 py-2 bg-obsidian-accent hover:bg-obsidian-accentHover text-xs font-semibold rounded-md text-white transition-colors">Save Changes</button>
+            </div>
         </div>
     </div>
 
@@ -475,10 +593,30 @@
         const randomNames = ["Astarion", "Shadowheart", "Gale", "Wyll", "Lae'zel", "Karlach", "Halsin", "Jaheira", "Minsc", "Minthara", "Volo", "Elminster", "Scratch", "Withers"];
         const randomColors = ["#a855f7", "#ec4899", "#3b82f6", "#10b981", "#f59e0b", "#ef4444", "#06b6d4", "#84cc16", "#14b8a6"];
         
+        // 1. Permanent Peer ID & Profile Persistence Strategy
+        let persistedPeerId = localStorage.getItem('caderno_peer_id');
+        if (!persistedPeerId) {
+            // Generate robust collision-free long peer ID signature for identification stability
+            persistedPeerId = 'peer_' + Math.random().toString(36).substring(2, 9) + '_' + Math.random().toString(36).substring(2, 9);
+            localStorage.setItem('caderno_peer_id', persistedPeerId);
+        }
+
+        let persistedName = localStorage.getItem('caderno_user_name');
+        if (!persistedName) {
+            persistedName = randomNames[Math.floor(Math.random() * randomNames.length)] + " " + Math.floor(100 + Math.random() * 900);
+            localStorage.setItem('caderno_user_name', persistedName);
+        }
+
+        let persistedColor = localStorage.getItem('caderno_user_color');
+        if (!persistedColor) {
+            persistedColor = randomColors[Math.floor(Math.random() * randomColors.length)];
+            localStorage.setItem('caderno_user_color', persistedColor);
+        }
+
         const localUser = {
-            id: 'peer_' + Math.random().toString(36).substring(2, 9),
-            name: randomNames[Math.floor(Math.random() * randomNames.length)] + " " + Math.floor(100 + Math.random() * 900),
-            color: randomColors[Math.floor(Math.random() * randomColors.length)],
+            id: persistedPeerId,
+            name: persistedName,
+            color: persistedColor,
             isTyping: false,
             cursorPos: 0
         };
@@ -486,6 +624,7 @@
         let myPeer = null;
         let connections = []; 
         let remotePeersData = {}; 
+        let ownCursorFlagEnabled = false; // Toggle to view own name flag
 
         // Standardized STUN servers to guarantee robust firewall hole-punching for WebRTC connections
         const peerConfig = {
@@ -543,7 +682,8 @@
         };
 
         function setupHostPeer() {
-            myPeer = new Peer(peerConfig);
+            // Guarantee Peer ID persistence by passing localUser.id
+            myPeer = new Peer(localUser.id, peerConfig);
             myPeer.on('open', (id) => {
                 const baseUrl = window.location.origin + window.location.pathname;
                 window.history.replaceState(null, '', `?room=${id}`);
@@ -551,11 +691,23 @@
                 setupPresenceHeartbeat();
             });
             myPeer.on('connection', handleNewConnection);
-            myPeer.on('error', () => showToast(i18n[currentLang].toastP2PError, "error"));
+            myPeer.on('error', (err) => {
+                console.warn("Host engine setup error:", err);
+                if (err.type === 'unavailable-id') {
+                    // Try to regenerate ID or fall back to native auto ID in case of collisions
+                    localStorage.removeItem('caderno_peer_id');
+                    localUser.id = 'peer_' + Math.random().toString(36).substring(2, 9) + '_' + Math.random().toString(36).substring(2, 9);
+                    localStorage.setItem('caderno_peer_id', localUser.id);
+                    setTimeout(setupHostPeer, 500);
+                } else {
+                    showToast(i18n[currentLang].toastP2PError, "error");
+                }
+            });
         }
 
         function setupClientPeer(targetRoomId) {
-            myPeer = new Peer(peerConfig);
+            // Guarantee client-side Peer ID persistence by passing localUser.id
+            myPeer = new Peer(localUser.id, peerConfig);
             myPeer.on('open', (id) => {
                 updateP2PStatusIndicator(true, currentLang === 'pt-br' ? "Conectando ao Hospedeiro..." : "Connecting to Host...");
                 const conn = myPeer.connect(targetRoomId, { reliable: true });
@@ -568,6 +720,14 @@
 
             myPeer.on('error', (err) => {
                 console.error("PeerJS Connection Error:", err);
+                if (err.type === 'unavailable-id') {
+                    localStorage.removeItem('caderno_peer_id');
+                    localUser.id = 'peer_' + Math.random().toString(36).substring(2, 9) + '_' + Math.random().toString(36).substring(2, 9);
+                    localStorage.setItem('caderno_peer_id', localUser.id);
+                    setTimeout(() => setupClientPeer(targetRoomId), 500);
+                    return;
+                }
+                
                 showToast(i18n[currentLang].toastP2PReachHostError, "error");
                 const cleanUrl = window.location.origin + window.location.pathname;
                 window.history.replaceState(null, '', cleanUrl);
@@ -598,7 +758,8 @@
                     const syncObj = {
                         type: 'INITIAL_SYNC',
                         vault: window.vault,
-                        activeNoteKey: window.activeNoteKey
+                        activeNoteKey: window.activeNoteKey,
+                        blameMap: window.blameMap // Transmit Blame authorship telemetry
                     };
                     const safePayload = encodePayload(syncObj);
                     if (safePayload) conn.send({ __safe_payload: safePayload });
@@ -642,6 +803,7 @@
                     if (msg.vault) {
                         window.vault = msg.vault;
                         if (msg.activeNoteKey) window.activeNoteKey = msg.activeNoteKey;
+                        if (msg.blameMap) window.blameMap = msg.blameMap;
                         window.renderVaultList();
                         window.loadActiveNote();
                         showToast(i18n[currentLang].toastSyncHost, "success");
@@ -651,7 +813,12 @@
                 case 'VAULT_UPDATE':
                     if (msg.vault) {
                         window.vault = msg.vault;
-                        if (msg.activeNoteKey) window.activeNoteKey = msg.activeNoteKey;
+                        // DO NOT hijack current activeNoteKey if the peer created or renamed a note!
+                        // This prevents forcefully pulling users into newly created documents!
+                        if (msg.activeNoteKey && !window.vault[window.activeNoteKey]) {
+                            window.activeNoteKey = msg.activeNoteKey;
+                        }
+                        if (msg.blameMap) window.blameMap = msg.blameMap;
                         window.renderVaultList();
                         window.loadActiveNote();
                     }
@@ -662,6 +829,18 @@
                         const currentText = window.vault[msg.noteKey].content;
                         const [patchedText, results] = window.dmp.patch_apply(msg.patches, currentText);
                         window.vault[msg.noteKey].content = patchedText;
+
+                        // Recalculate Blame telemetry matrix based on diffs
+                        if (msg.authorId && msg.authorColor && msg.authorName) {
+                            window.updateBlameTracking(msg.noteKey, currentText, patchedText, {
+                                id: msg.authorId,
+                                color: msg.authorColor,
+                                name: msg.authorName
+                            });
+                        }
+
+                        // Check if we were mentioned in this patch
+                        window.scanForMentions(patchedText, msg.noteKey, msg.authorName || 'Um colaborador');
 
                         if (window.activeNoteKey === msg.noteKey) {
                             const textarea = document.getElementById("markdown-textarea");
@@ -707,6 +886,7 @@
                         }
 
                         remotePeersData[senderConn.peer] = {
+                            id: senderConn.peer,
                             name: msg.name,
                             color: msg.color,
                             isTyping: msg.isTyping,
@@ -847,6 +1027,27 @@
             editorContainer.innerHTML = '';
             document.querySelectorAll('.preview-remote-cursor').forEach(el => el.remove());
 
+            // Render local user cursor if toggled on
+            if (ownCursorFlagEnabled && document.activeElement === textarea) {
+                try {
+                    const coords = getCaretCoordinates(textarea, textarea.selectionStart);
+                    const cursorEl = document.createElement('div');
+                    cursorEl.className = 'remote-cursor shadow-sm';
+                    cursorEl.style.backgroundColor = localUser.color;
+                    cursorEl.style.height = coords.height + 'px';
+                    cursorEl.style.top = (coords.top - textarea.scrollTop) + 'px';
+                    cursorEl.style.left = coords.left + 'px';
+
+                    const flagEl = document.createElement('div');
+                    flagEl.className = 'remote-cursor-flag';
+                    flagEl.style.backgroundColor = localUser.color;
+                    flagEl.innerText = localUser.name.split(' ')[0] + " (Você)";
+                    
+                    cursorEl.appendChild(flagEl);
+                    editorContainer.appendChild(cursorEl);
+                } catch(e) {}
+            }
+
             Object.keys(remotePeersData).forEach(peerId => {
                 const p = remotePeersData[peerId];
                 if (p.activeNote === activeNoteKey && p.cursorPos !== undefined) {
@@ -966,7 +1167,10 @@
             broadcastMessageToPeers({
                 type: 'NOTE_PATCH',
                 noteKey: noteKey,
-                patches: patches
+                patches: patches,
+                authorId: localUser.id,
+                authorName: localUser.name,
+                authorColor: localUser.color
             });
 
             localUser.isTyping = true;
@@ -983,7 +1187,10 @@
             broadcastMessageToPeers({
                 type: 'VAULT_UPDATE',
                 vault: window.vault,
-                activeNoteKey: window.activeNoteKey
+                // NEVER broadcast the newly updated note as activeNoteKey, 
+                // preventing pushing peers into files they did not ask to enter!
+                activeNoteKey: null,
+                blameMap: window.blameMap
             });
         };
     </script>
@@ -1078,7 +1285,15 @@
                 toastP2PReachHostError: "Could not reach host. Starting standalone session.",
                 toastDownloaded: "Downloaded \"{title}\"",
                 downloadTooltip: "Download note as .md file",
-                downloadBtnLabel: "Download .md"
+                downloadBtnLabel: "Download .md",
+                
+                // Profile translations
+                profileBtn: "Profile",
+                profileTitle: "Configure Profile",
+                profileDesc: "Set your permanent identifier and nickname for this notebook. Changes take effect immediately across all connected peers.",
+                profileLabelNick: "Nickname",
+                profileLabelColor: "Cursor & Avatar Color",
+                toastProfileUpdated: "Profile updated successfully!"
             },
             'pt-br': {
                 vaultTitle: "CADERNO",
@@ -1113,7 +1328,7 @@
                 cancel: "Cancelar",
                 delete: "Excluir",
                 toastCreated: "Nova nota criada",
-                toastDeleted: "Excluído \"{title}\"",
+                toastDeleted: "Excluir \"{title}\"",
                 toastQuestCompleted: "Tarefa concluída!",
                 toastQuestReset: "Tarefa reiniciada!",
                 toastSyncHost: "Caderno inicializado pelo Hospedeiro!",
@@ -1123,7 +1338,15 @@
                 toastP2PReachHostError: "Não foi possível alcançar o hospedeiro. Iniciando sessão autônoma.",
                 toastDownloaded: "\"{title}\" baixado com sucesso!",
                 downloadTooltip: "Baixar nota como arquivo .md",
-                downloadBtnLabel: "Baixar .md"
+                downloadBtnLabel: "Baixar .md",
+                
+                // Profile translations
+                profileBtn: "Perfil",
+                profileTitle: "Personalizar Perfil",
+                profileDesc: "Defina seu identificador permanente e apelido para este caderno. Mudanças tomam efeito imediato entre todos os participantes.",
+                profileLabelNick: "Apelido / Nickname",
+                profileLabelColor: "Sua Cor de Cursor & Avatar",
+                toastProfileUpdated: "Perfil atualizado com sucesso!"
             }
         };
 
@@ -1176,6 +1399,13 @@
             document.getElementById('btn-reading-mode').innerHTML = `<i class="fa-solid fa-book-open mr-1"></i> ` + t.modeReading;
             document.getElementById('btn-split-mode').innerHTML = `<i class="fa-solid fa-columns mr-1"></i> ` + t.modeSplit;
 
+            // Profile inputs
+            document.getElementById('profile-btn-text').innerText = t.profileBtn;
+            document.getElementById('profile-modal-header').innerText = t.profileTitle;
+            document.getElementById('profile-modal-desc').innerText = t.profileDesc;
+            document.getElementById('profile-label-nick').innerText = t.profileLabelNick;
+            document.getElementById('profile-label-color').innerText = t.profileLabelColor;
+
             const flagContainer = document.getElementById('active-flag-container');
             const langCodeLabel = document.getElementById('active-lang-code');
             if (lang === 'pt-br') {
@@ -1220,6 +1450,13 @@
         let isScrolling = false;
         let deleteCandidateKey = null;
 
+        // Blame tracking map schema: { noteKey: [ { authorId, name, color, charLength } ] }
+        var blameMap = {};
+        let blameModeEnabled = false;
+
+        // Mention Tracking: [ { noteKey, authorName, text, timestamp, read: false } ]
+        var userMentions = [];
+
         window.initializeVaultState = function() {
             if (window.vaultInitialized) return;
             initLanguageSystem();
@@ -1241,6 +1478,17 @@
             } else {
                 activeNoteKey = Object.keys(vault)[0] || "";
             }
+
+            const savedBlame = localStorage.getItem("caderno_blame_map");
+            if (savedBlame) {
+                try { blameMap = JSON.parse(savedBlame); } catch(e){}
+            }
+
+            const savedMentions = localStorage.getItem("caderno_mentions");
+            if (savedMentions) {
+                try { userMentions = JSON.parse(savedMentions); } catch(e){}
+            }
+            updateMentionsUI();
 
             window.vaultInitialized = true;
         };
@@ -1267,6 +1515,8 @@
                 if (e.key === 'Escape') {
                     closeCommandPalette();
                     closeDeleteModal();
+                    closeProfileModal();
+                    hideMentionAutocomplete();
                 }
                 if ((e.ctrlKey || e.metaKey) && e.key === 'p') {
                     e.preventDefault();
@@ -1279,6 +1529,15 @@
                 if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key.toLowerCase() === 'o') {
                     e.preventDefault();
                     toggleSidebar('right-sidebar');
+                }
+            });
+
+            // Click outside drop-down listener
+            document.addEventListener('click', function(e) {
+                const mentionsDropdown = document.getElementById('mentions-dropdown');
+                const mentionsBell = document.getElementById('btn-mentions-bell');
+                if (mentionsDropdown && mentionsBell && !mentionsBell.contains(e.target) && !mentionsDropdown.contains(e.target)) {
+                    mentionsDropdown.classList.add('hidden');
                 }
             });
         };
@@ -1301,6 +1560,8 @@
         function saveVaultLocalOnly() {
             localStorage.setItem("caderno_vault", JSON.stringify(vault));
             localStorage.setItem("caderno_active_key", activeNoteKey);
+            localStorage.setItem("caderno_blame_map", JSON.stringify(blameMap));
+            localStorage.setItem("caderno_mentions", JSON.stringify(userMentions));
             updateGlobalProgressTracker();
         }
 
@@ -1311,6 +1572,95 @@
             }
         }
 
+        /* Git Blame Tracking: Update authorship map linearly with character-level accuracy using DMP */
+        window.updateBlameTracking = function(noteKey, oldText, newText, author) {
+            if (!blameMap[noteKey]) {
+                blameMap[noteKey] = [];
+            }
+
+            let currentMap = blameMap[noteKey];
+
+            // If empty map, map everything to current length as default
+            if (currentMap.length === 0 && oldText.length > 0) {
+                currentMap.push({
+                    authorId: 'system',
+                    name: 'Origin',
+                    color: '#475569',
+                    length: oldText.length
+                });
+            }
+
+            const diffs = window.dmp.diff_main(oldText, newText);
+            window.dmp.diff_cleanupSemantic(diffs);
+
+            let newMap = [];
+            let oldMapIndex = 0;
+
+            diffs.forEach(diff => {
+                const op = diff[0]; // 0: Equal, 1: Insert, -1: Delete
+                const text = diff[1];
+                let length = text.length;
+
+                if (op === 0) { // Keep existing authorship mapped characters
+                    while (length > 0 && oldMapIndex < currentMap.length) {
+                        const segment = currentMap[oldMapIndex];
+                        const available = segment.length;
+
+                        if (available <= length) {
+                            newMap.push({ ...segment });
+                            length -= available;
+                            oldMapIndex++;
+                        } else {
+                            newMap.push({
+                                authorId: segment.authorId,
+                                name: segment.name,
+                                color: segment.color,
+                                length: length
+                            });
+                            segment.length -= length;
+                            length = 0;
+                        }
+                    }
+                } else if (op === 1) { // Inserted characters are allocated to current modifier
+                    newMap.push({
+                        authorId: author.id,
+                        name: author.name,
+                        color: author.color,
+                        length: length
+                    });
+                } else if (op === -1) { // Consume/skip characters from current map
+                    while (length > 0 && oldMapIndex < currentMap.length) {
+                        const segment = currentMap[oldMapIndex];
+                        const available = segment.length;
+
+                        if (available <= length) {
+                            length -= available;
+                            oldMapIndex++;
+                        } else {
+                            segment.length -= length;
+                            length = 0;
+                        }
+                    }
+                }
+            });
+
+            // Merge consecutive fragments with identical author
+            let consolidatedMap = [];
+            newMap.forEach(seg => {
+                if (seg.length === 0) return;
+                const last = consolidatedMap[consolidatedMap.length - 1];
+                if (last && last.authorId === seg.authorId) {
+                    last.length += seg.length;
+                } else {
+                    consolidatedMap.push(seg);
+                }
+            });
+
+            blameMap[noteKey] = consolidatedMap;
+            saveVaultLocalOnly();
+        };
+
+        // Render Markdown content with inline Blame overlays
         function renderMarkdown(markdownText) {
             if (!markdownText) return `<p class="text-neutral-500 italic">${i18n[currentLang].noContent}</p>`;
             
@@ -1320,7 +1670,66 @@
             let codeBlockContent = '';
             let codeBlockStartLine = 0;
 
+            // Generate character map index mapping for active note if Blame mode is active
+            let charIndex = 0;
+            const currentBlame = blameMap[activeNoteKey] || [];
+
+            function getHTMLWithBlame(text, startOffset) {
+                if (!blameModeEnabled || currentBlame.length === 0) {
+                    return parseInlineElements(text);
+                }
+
+                let textLen = text.length;
+                let processed = 0;
+                let resultHTML = '';
+
+                // Find where startOffset starts in blame array
+                let accumulated = 0;
+                let blameIdx = 0;
+
+                while (blameIdx < currentBlame.length && accumulated + currentBlame[blameIdx].length <= startOffset) {
+                    accumulated += currentBlame[blameIdx].length;
+                    blameIdx++;
+                }
+
+                while (processed < textLen && blameIdx < currentBlame.length) {
+                    const seg = currentBlame[blameIdx];
+                    const segStartInText = Math.max(0, accumulated - startOffset);
+                    const segEndInText = Math.min(textLen, accumulated + seg.length - startOffset);
+                    const lenInSegment = segEndInText - segStartInText;
+
+                    if (lenInSegment > 0) {
+                        const subText = text.substring(processed, processed + lenInSegment);
+                        const safeSub = parseInlineElements(subText);
+                        
+                        // Semi transparent version of user color for text selection highlighters
+                        const hexColor = seg.color;
+                        let r = 100, g = 100, b = 100;
+                        if (hexColor.startsWith('#')) {
+                            const num = parseInt(hexColor.slice(1), 16);
+                            r = (num >> 16) & 255;
+                            g = (num >> 8) & 255;
+                            b = num & 255;
+                        }
+
+                        resultHTML += `<span class="blame-highlight" style="background-color: rgba(${r}, ${g}, ${b}, 0.22);" title="Modificado por: ${seg.name}">${safeSub}</span>`;
+                        processed += lenInSegment;
+                    }
+
+                    accumulated += seg.length;
+                    blameIdx++;
+                }
+
+                if (processed < textLen) {
+                    resultHTML += parseInlineElements(text.substring(processed));
+                }
+
+                return resultHTML;
+            }
+
             lines.forEach((line, index) => {
+                const lineLengthIncludingNewline = line.length + 1; // +1 for the newline character
+
                 if (line.trim().startsWith('```')) {
                     if (inCodeBlock) {
                         html += `<pre class="bg-neutral-900 border border-neutral-800 p-3 rounded-lg my-2 font-mono text-xs overflow-x-auto text-purple-300"><code>${escapeHTML(codeBlockContent)}</code></pre>`;
@@ -1330,33 +1739,41 @@
                         inCodeBlock = true;
                         codeBlockStartLine = index;
                     }
+                    charIndex += lineLengthIncludingNewline;
                     return;
                 }
 
                 if (inCodeBlock) {
                     codeBlockContent += line + '\n';
+                    charIndex += lineLengthIncludingNewline;
                     return;
                 }
 
                 if (line.trim() === '---') {
                     html += `<hr class="border-obsidian-border my-5" />`;
+                    charIndex += lineLengthIncludingNewline;
                     return;
                 }
 
+                // Render structure headers with Blame mapping overlays
                 if (line.startsWith('# ')) {
-                    html += `<h1 id="heading-${index}" class="text-white hover:text-obsidian-accent cursor-pointer transition-colors font-sans" onclick="scrollEditorToLine(${index})">${parseInlineElements(line.slice(2))}</h1>`;
+                    html += `<h1 id="heading-${index}" class="text-white hover:text-obsidian-accent cursor-pointer transition-colors font-sans" onclick="scrollEditorToLine(${index})">${getHTMLWithBlame(line.slice(2), charIndex + 2)}</h1>`;
+                    charIndex += lineLengthIncludingNewline;
                     return;
                 }
                 if (line.startsWith('## ')) {
-                    html += `<h2 id="heading-${index}" class="text-white hover:text-obsidian-accent cursor-pointer transition-colors font-sans" onclick="scrollEditorToLine(${index})">${parseInlineElements(line.slice(3))}</h2>`;
+                    html += `<h2 id="heading-${index}" class="text-white hover:text-obsidian-accent cursor-pointer transition-colors font-sans" onclick="scrollEditorToLine(${index})">${getHTMLWithBlame(line.slice(3), charIndex + 3)}</h2>`;
+                    charIndex += lineLengthIncludingNewline;
                     return;
                 }
                 if (line.startsWith('### ')) {
-                    html += `<h3 id="heading-${index}" class="text-white hover:text-obsidian-accent cursor-pointer transition-colors font-sans" onclick="scrollEditorToLine(${index})">${parseInlineElements(line.slice(4))}</h3>`;
+                    html += `<h3 id="heading-${index}" class="text-white hover:text-obsidian-accent cursor-pointer transition-colors font-sans" onclick="scrollEditorToLine(${index})">${getHTMLWithBlame(line.slice(4), charIndex + 4)}</h3>`;
+                    charIndex += lineLengthIncludingNewline;
                     return;
                 }
                 if (line.startsWith('#### ')) {
-                    html += `<h4 id="heading-${index}" class="text-white hover:text-obsidian-accent cursor-pointer transition-colors font-sans" onclick="scrollEditorToLine(${index})">${parseInlineElements(line.slice(5))}</h4>`;
+                    html += `<h4 id="heading-${index}" class="text-white hover:text-obsidian-accent cursor-pointer transition-colors font-sans" onclick="scrollEditorToLine(${index})">${getHTMLWithBlame(line.slice(5), charIndex + 5)}</h4>`;
+                    charIndex += lineLengthIncludingNewline;
                     return;
                 }
 
@@ -1365,14 +1782,16 @@
                 if (checkboxMatch) {
                     const spaces = checkboxMatch[1].length;
                     const isChecked = checkboxMatch[2].toLowerCase() === 'x';
-                    const mainText = parseInlineElements(checkboxMatch[3]);
+                    const offsetStart = charIndex + spaces + 5; // - [ ] or - [x]
+                    const mainTextWithBlame = getHTMLWithBlame(checkboxMatch[3], offsetStart);
                     const paddingLeft = spaces * 8; 
 
                     html += `
                     <div class="task-item flex items-start gap-2.5 py-1 px-1.5 rounded-md hover:bg-neutral-800/30 transition-all font-sans" style="margin-left: ${paddingLeft}px">
                         <input type="checkbox" ${isChecked ? 'checked' : ''} data-line-index="${index}" class="obsidian-checkbox mt-1 flex-shrink-0">
-                        <span class="text-gray-300 ${isChecked ? 'line-through text-neutral-500' : ''} text-sm leading-relaxed">${mainText}</span>
+                        <span class="text-gray-300 ${isChecked ? 'line-through text-neutral-500' : ''} text-sm leading-relaxed">${mainTextWithBlame}</span>
                     </div>`;
+                    charIndex += lineLengthIncludingNewline;
                     return;
                 }
 
@@ -1380,23 +1799,27 @@
                 const bulletMatch = line.match(bulletRegex);
                 if (bulletMatch) {
                     const spaces = bulletMatch[1].length;
-                    const mainText = parseInlineElements(bulletMatch[2]);
+                    const offsetStart = charIndex + spaces + 2; // - 
+                    const mainTextWithBlame = getHTMLWithBlame(bulletMatch[2], offsetStart);
                     const paddingLeft = spaces * 8;
 
                     html += `
                     <div class="bullet-item flex items-start gap-2.5 py-0.5 font-sans" style="margin-left: ${paddingLeft}px">
                         <span class="text-obsidian-accent select-none mt-2 w-1.5 h-1.5 rounded-full bg-obsidian-accent flex-shrink-0"></span>
-                        <span class="text-gray-300 text-sm leading-relaxed">${mainText}</span>
+                        <span class="text-gray-300 text-sm leading-relaxed">${mainTextWithBlame}</span>
                     </div>`;
+                    charIndex += lineLengthIncludingNewline;
                     return;
                 }
 
                 if (line.trim() === '') {
                     html += `<div class="h-2"></div>`;
+                    charIndex += lineLengthIncludingNewline;
                     return;
                 }
 
-                html += `<p class="text-sm my-1 font-sans">${parseInlineElements(line)}</p>`;
+                html += `<p class="text-sm my-1 font-sans">${getHTMLWithBlame(line, charIndex)}</p>`;
+                charIndex += lineLengthIncludingNewline;
             });
 
             return html;
@@ -1404,6 +1827,11 @@
 
         function parseInlineElements(text) {
             let parsed = escapeHTML(text);
+            
+            // Render Spoiler markup ||spoiler|| BEFORE parsing other formats
+            const spoilerTitle = currentLang === 'pt-br' ? 'Spoiler: Clique para revelar' : 'Spoiler: Click to reveal';
+            parsed = parsed.replace(/\|\|(.*?)\|\|/g, `<span class="markdown-spoiler" onclick="this.classList.toggle('revealed')" title="${spoilerTitle}">$1</span>`);
+
             parsed = parsed.replace(/\*\*(.*?)\*\*/g, '<strong class="font-bold text-white">$1</strong>');
             parsed = parsed.replace(/__(.*?)__/g, '<strong class="font-bold text-white">$1</strong>');
             parsed = parsed.replace(/\*(.*?)\*/g, '<em class="italic">$1</em>');
@@ -1411,6 +1839,14 @@
             parsed = parsed.replace(/==(.*?)==/g, '<mark class="bg-purple-900/40 text-purple-300 border border-purple-800/40 px-1 py-0.5 rounded text-xs font-semibold">$1</mark>');
             parsed = parsed.replace(/`(.*?)`/g, '<code class="bg-neutral-800 border border-neutral-700 px-1.5 py-0.5 rounded font-mono text-xs text-purple-300">$1</code>');
             parsed = parsed.replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2" target="_blank" class="text-purple-400 hover:text-purple-300 font-semibold underline inline-flex items-center gap-1">$1 <i class="fa-solid fa-external-link text-[10px] opacity-70"></i></a>');
+            
+            // Render Mentions cleanly as highlighted badge with real name from metadata map
+            parsed = parsed.replace(/&lt;mention::(peer_[a-z0-9_]+)&gt;/g, (match, peerId) => {
+                let name = peerId === localUser.id ? localUser.name : (remotePeersData[peerId]?.name || peerId);
+                let color = peerId === localUser.id ? localUser.color : (remotePeersData[peerId]?.color || 'var(--accent-color)');
+                return `<span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-xs font-semibold bg-obsidian-active text-white border-l-2" style="border-color: ${color}">@${escapeHTML(name)}</span>`;
+            });
+
             return parsed;
         }
 
@@ -1533,6 +1969,12 @@
                 
                 textarea.value = updatedContent;
                 vault[activeNoteKey].content = updatedContent;
+
+                window.updateBlameTracking(activeNoteKey, oldText, updatedContent, {
+                    id: localUser.id,
+                    name: localUser.name,
+                    color: localUser.color
+                });
 
                 saveVaultLocalOnly();
                 if (window.broadcastNotePatch) {
@@ -1703,12 +2145,31 @@
 
         function createNewNote() {
             const id = "note_" + Date.now();
+            const noteTitle = currentLang === 'pt-br' ? "Nota Sem Título" : "Untitled Note";
+            const noteContent = currentLang === 'pt-br' 
+                ? "# Nota Sem Título\n\n- [ ] Novas tarefas aqui\n- [ ] Dê um duplo-clique no título no menu lateral para renomear!" 
+                : "# Untitled Note\n\n- [ ] New objectives go here\n- [ ] Double click the title in explorer to rename";
+            
             vault[id] = {
-                title: currentLang === 'pt-br' ? "Nota Sem Título" : "Untitled Note",
-                content: currentLang === 'pt-br' ? "# Nota Sem Título\n\n- [ ] Novas tarefas aqui\n- [ ] Dê um duplo-clique no título no menu lateral para renomear!" : "# Untitled Note\n\n- [ ] New objectives go here\n- [ ] Double click the title in explorer to rename"
+                title: noteTitle,
+                content: noteContent
             };
+
+            // Initialize local blame attribution
+            window.updateBlameTracking(id, "", noteContent, {
+                id: localUser.id,
+                name: localUser.name,
+                color: localUser.color
+            });
+
             activeNoteKey = id;
-            saveVaultStructure();
+            
+            // Critical correction: Save locally AND broadcast struct update (but DO NOT force jump peers)
+            saveVaultLocalOnly();
+            if (window.triggerP2PVaultStructureUpdate) {
+                window.triggerP2PVaultStructureUpdate();
+            }
+
             renderVaultList();
             loadActiveNote();
             showToast(i18n[currentLang].toastCreated, "success");
@@ -1743,7 +2204,13 @@
         function finishInlineRename(key, newTitle, originalTitle) {
             const cleanedTitle = newTitle.trim() || originalTitle;
             vault[key].title = cleanedTitle;
-            saveVaultStructure();
+            
+            // Critical correction: Save locally AND broadcast struct update without forcing navigation
+            saveVaultLocalOnly();
+            if (window.triggerP2PVaultStructureUpdate) {
+                window.triggerP2PVaultStructureUpdate();
+            }
+
             renderVaultList();
             if (activeNoteKey === key) loadActiveNote();
         }
@@ -1766,6 +2233,7 @@
             if (!deleteCandidateKey) return;
             const title = vault[deleteCandidateKey].title;
             delete vault[deleteCandidateKey];
+            delete blameMap[deleteCandidateKey]; // Clean telemetry
             
             if (activeNoteKey === deleteCandidateKey) {
                 const keys = Object.keys(vault);
@@ -1786,6 +2254,13 @@
             const oldText = vault[activeNoteKey].content;
 
             vault[activeNoteKey].content = newText;
+            
+            window.updateBlameTracking(activeNoteKey, oldText, newText, {
+                id: localUser.id,
+                name: localUser.name,
+                color: localUser.color
+            });
+
             saveVaultLocalOnly();
 
             if (window.broadcastNotePatch) {
@@ -1793,6 +2268,7 @@
             }
 
             renderActiveNote(); // Triggers updateLineNumbers & syncing
+            triggerAutocompleteCheck(textarea);
         }
 
         function handleTitleInput() {
@@ -2039,6 +2515,349 @@
             }
         };
 
+        /* Mentions UI Toggle Dropdowns */
+        window.toggleMentionsDropdown = function(event) {
+            if (event) event.stopPropagation();
+            const dropdown = document.getElementById('mentions-dropdown');
+            dropdown.classList.toggle('hidden');
+        };
+
+        window.scanForMentions = function(text, noteKey, authorName) {
+            // Mention pattern: <mention::PEER_ID>
+            const pattern = new RegExp(`<mention::(${localUser.id})>`, 'g');
+            if (pattern.test(text)) {
+                // Check if we already logged this mention recently to avoid duplicate alerts
+                const isDuplicate = userMentions.some(m => m.noteKey === noteKey && m.authorName === authorName && (Date.now() - m.timestamp < 10000));
+                if (!isDuplicate) {
+                    userMentions.unshift({
+                        noteKey: noteKey,
+                        authorName: authorName,
+                        text: vault[noteKey]?.title || "Caderno",
+                        timestamp: Date.now(),
+                        read: false
+                    });
+                    saveVaultLocalOnly();
+                    updateMentionsUI();
+                    showToast(`Você foi mencionado por ${authorName}!`, 'success');
+                }
+            }
+        };
+
+        function updateMentionsUI() {
+            const unreadCount = userMentions.filter(m => !m.read).length;
+            const badge = document.getElementById('mention-badge');
+            if (unreadCount > 0) {
+                badge.innerText = unreadCount;
+                badge.classList.remove('hidden');
+            } else {
+                badge.classList.add('hidden');
+            }
+
+            const listContainer = document.getElementById('mentions-list');
+            if (userMentions.length === 0) {
+                listContainer.innerHTML = `<p class="text-[11px] text-neutral-500 italic text-center py-4">Nenhuma menção recebida.</p>`;
+                return;
+            }
+
+            listContainer.innerHTML = '';
+            userMentions.forEach((m, idx) => {
+                const item = document.createElement('div');
+                item.className = `p-2 hover:bg-obsidian-active cursor-pointer transition-colors flex flex-col gap-0.5 ${!m.read ? 'border-l-2 border-obsidian-accent' : ''}`;
+                item.onclick = () => {
+                    m.read = true;
+                    saveVaultLocalOnly();
+                    updateMentionsUI();
+                    selectNote(m.noteKey);
+                    document.getElementById('mentions-dropdown').classList.add('hidden');
+                };
+                
+                const dateStr = new Date(m.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+                item.innerHTML = `
+                    <div class="flex justify-between text-[10px] text-neutral-400">
+                        <span class="font-bold text-gray-200">@${escapeHTML(m.authorName)}</span>
+                        <span>${dateStr}</span>
+                    </div>
+                    <span class="text-[11px] text-gray-300 truncate">Mencionou você em: <span class="text-obsidian-accent font-semibold">${escapeHTML(m.text)}</span></span>
+                `;
+                listContainer.appendChild(item);
+            });
+        }
+
+        window.clearMentions = function() {
+            userMentions = [];
+            saveVaultLocalOnly();
+            updateMentionsUI();
+        };
+
+        /* Personal Own Cursor Toggle Option */
+        window.toggleOwnCursorFlag = function() {
+            ownCursorFlagEnabled = !ownCursorFlagEnabled;
+            const icon = document.getElementById('btn-own-cursor-icon');
+            if (ownCursorFlagEnabled) {
+                icon.className = "fa-solid fa-toggle-on text-obsidian-accent";
+            } else {
+                icon.className = "fa-solid fa-toggle-off text-neutral-500";
+            }
+            renderRemoteCursors();
+        };
+
+        /* Toggle Blame overlay highlight mode */
+        window.toggleBlameMode = function() {
+            blameModeEnabled = !blameModeEnabled;
+            const btn = document.getElementById('btn-blame-toggle');
+            if (blameModeEnabled) {
+                btn.className = "px-2 py-1.5 bg-obsidian-active rounded transition-all border border-obsidian-border text-obsidian-accent font-bold";
+            } else {
+                btn.className = "px-2 py-1.5 hover:bg-obsidian-active rounded transition-all border border-obsidian-border/50 flex items-center gap-1.5 shrink-0";
+            }
+            renderActiveNote();
+        };
+
+        /* Profile Modal Operations */
+        window.openProfileModal = function() {
+            document.getElementById('profile-nickname-input').value = localUser.name;
+            selectProfileColor(localUser.color);
+            document.getElementById('profile-modal').classList.remove('hidden');
+            document.getElementById('profile-modal').classList.add('flex');
+        };
+
+        window.closeProfileModal = function() {
+            document.getElementById('profile-modal').classList.add('hidden');
+            document.getElementById('profile-modal').classList.remove('flex');
+        };
+
+        window.selectProfileColor = function(colorHex) {
+            // Unselect previous
+            document.querySelectorAll('.profile-color-dot').forEach(el => {
+                el.classList.remove('border-white', 'scale-110');
+                el.innerHTML = '';
+            });
+
+            // Find matching or fallback custom
+            const target = Array.from(document.querySelectorAll('.profile-color-dot')).find(el => el.getAttribute('data-color') === colorHex);
+            if (target) {
+                target.classList.add('border-white', 'scale-110');
+                target.innerHTML = '<i class="fa-solid fa-check text-xs text-white absolute inset-0 m-auto flex items-center justify-center"></i>';
+            }
+            document.getElementById('profile-color-picker').value = colorHex;
+            window.tempProfileColor = colorHex;
+        };
+
+        window.saveProfile = function() {
+            const nickname = document.getElementById('profile-nickname-input').value.trim();
+            if (!nickname) return;
+
+            localUser.name = nickname;
+            localUser.color = window.tempProfileColor || localUser.color;
+
+            localStorage.setItem('caderno_user_name', localUser.name);
+            localStorage.setItem('caderno_user_color', localUser.color);
+
+            closeProfileModal();
+            renderPresenceList();
+            renderRemoteCursors();
+            
+            // Broadcast profile change presence event to all connected mesh peers
+            if (myPeer && !myPeer.destroyed) {
+                broadcastMessageToPeers({
+                    type: 'PRESENCE',
+                    name: localUser.name,
+                    color: localUser.color,
+                    isTyping: localUser.isTyping,
+                    activeNoteKey: window.activeNoteKey,
+                    cursorPos: localUser.cursorPos
+                });
+            }
+
+            showToast(i18n[currentLang].toastProfileUpdated, "success");
+        };
+
+        /* Autocomplete logic for @ Mentions */
+        let mentionStartIndex = -1;
+
+        function triggerAutocompleteCheck(textarea) {
+            const text = textarea.value;
+            const caretPos = textarea.selectionStart;
+            
+            // Look backward from caret to find the last '@'
+            const textBeforeCaret = text.substring(0, caretPos);
+            const atIndex = textBeforeCaret.lastIndexOf('@');
+            
+            if (atIndex !== -1 && atIndex >= textBeforeCaret.lastIndexOf(' ') && atIndex >= textBeforeCaret.lastIndexOf('\n')) {
+                const query = textBeforeCaret.substring(atIndex + 1);
+                mentionStartIndex = atIndex;
+                showMentionAutocomplete(query, textarea);
+            } else {
+                hideMentionAutocomplete();
+            }
+        }
+
+        function showMentionAutocomplete(query, textarea) {
+            const menu = document.getElementById('mention-autocomplete');
+            menu.innerHTML = '';
+
+            // Map candidate peers (including local)
+            const peers = [
+                { id: localUser.id, name: localUser.name + " (Você)", color: localUser.color },
+                ...Object.values(remotePeersData).map(p => ({ id: p.id, name: p.name, color: p.color }))
+            ];
+
+            const filtered = peers.filter(p => p.name.toLowerCase().includes(query.toLowerCase()));
+
+            if (filtered.length === 0) {
+                hideMentionAutocomplete();
+                return;
+            }
+
+            filtered.forEach(p => {
+                const item = document.createElement('button');
+                item.className = 'w-full text-left px-3 py-1.5 text-xs text-gray-300 hover:bg-obsidian-active hover:text-white flex items-center gap-2 transition-colors';
+                item.innerHTML = `<span class="w-2 h-2 rounded-full" style="background-color: ${p.color}"></span> ${escapeHTML(p.name)}`;
+                item.onclick = () => insertMention(p.id, p.name, textarea);
+                menu.appendChild(item);
+            });
+
+            // Calculate menu position relative to caret coordinates
+            try {
+                const coords = getCaretCoordinates(textarea, mentionStartIndex);
+                menu.style.top = (coords.top - textarea.scrollTop + coords.height + 15) + 'px';
+                menu.style.left = Math.min(textarea.clientWidth - 200, coords.left) + 'px';
+                menu.classList.remove('hidden');
+            } catch(e) {
+                menu.classList.add('hidden');
+            }
+        }
+
+        function hideMentionAutocomplete() {
+            document.getElementById('mention-autocomplete').classList.add('hidden');
+            mentionStartIndex = -1;
+        }
+
+        function insertMention(peerId, peerName, textarea) {
+            const text = textarea.value;
+            const caretPos = textarea.selectionStart;
+            
+            const before = text.substring(0, mentionStartIndex);
+            const after = text.substring(caretPos);
+            
+            // Inject structural markup token into active document payload
+            const mentionToken = `<mention::${peerId}>`;
+            const newText = before + mentionToken + after;
+            
+            const oldText = vault[activeNoteKey].content;
+            textarea.value = newText;
+            vault[activeNoteKey].content = newText;
+
+            window.updateBlameTracking(activeNoteKey, oldText, newText, {
+                id: localUser.id,
+                name: localUser.name,
+                color: localUser.color
+            });
+
+            saveVaultLocalOnly();
+            if (window.broadcastNotePatch) {
+                window.broadcastNotePatch(activeNoteKey, oldText, newText);
+            }
+
+            renderActiveNote();
+            hideMentionAutocomplete();
+            textarea.focus();
+            
+            // Reset cursor focus position cleanly after mention injection
+            const newCursorPos = mentionStartIndex + mentionToken.length;
+            textarea.setSelectionRange(newCursorPos, newCursorPos);
+        }
+
+        // Intercept navigation keys when mentions autocomplete is visible
+        window.handleEditorKeyDown = function(e) {
+            const menu = document.getElementById('mention-autocomplete');
+            if (menu && !menu.classList.contains('hidden')) {
+                if (e.key === 'Escape' || e.key === 'ArrowUp' || e.key === 'ArrowDown' || e.key === 'Enter') {
+                    // Let keyboard controls handle autocomplete if desired, or simply close on Escape
+                    if (e.key === 'Escape') {
+                        e.preventDefault();
+                        hideMentionAutocomplete();
+                    }
+                }
+            }
+        };
+
+        /* INTEGRAL OS FILE SYSTEM BACKUP SYSTEM (JSON package export/import) */
+        window.exportFullVaultBackup = function() {
+            const backupPackage = {
+                version: "2.0",
+                exportedAt: Date.now(),
+                vault: vault,
+                blameMap: blameMap,
+                mentions: userMentions
+            };
+
+            try {
+                const jsonStr = JSON.stringify(backupPackage, null, 2);
+                const blob = new Blob([jsonStr], { type: 'application/json;charset=utf-8;' });
+                const url = URL.createObjectURL(blob);
+                
+                const dateStr = new Date().toISOString().split('T')[0];
+                const tempLink = document.createElement('a');
+                tempLink.href = url;
+                tempLink.setAttribute('download', `caderno-backup-${dateStr}.json`);
+                document.body.appendChild(tempLink);
+                tempLink.click();
+                document.body.removeChild(tempLink);
+                URL.revokeObjectURL(url);
+
+                showToast(currentLang === 'pt-br' ? "Backup exportado com sucesso!" : "Full backup exported successfully!", "success");
+            } catch(e) {
+                console.error("Backup export failed", e);
+                showToast(currentLang === 'pt-br' ? "Falha ao exportar backup." : "Backup export failed.", "error");
+            }
+        };
+
+        window.importFullVaultBackup = function(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const parsed = JSON.parse(e.target.result);
+                    
+                    if (parsed && parsed.vault) {
+                        vault = parsed.vault;
+                        if (parsed.blameMap) blameMap = parsed.blameMap;
+                        if (parsed.mentions) userMentions = parsed.mentions;
+
+                        const keys = Object.keys(vault);
+                        if (keys.length > 0) {
+                            activeNoteKey = keys[0];
+                        }
+
+                        // Save loaded package state locally
+                        saveVaultLocalOnly();
+                        
+                        // Synchronize imported vault metadata cleanly with the Peer Network
+                        if (window.triggerP2PVaultStructureUpdate) {
+                            window.triggerP2PVaultStructureUpdate();
+                        }
+
+                        renderVaultList();
+                        loadActiveNote();
+                        updateMentionsUI();
+
+                        showToast(currentLang === 'pt-br' ? "Caderno restaurado com sucesso!" : "Caderno restored successfully!", "success");
+                    } else {
+                        showToast(currentLang === 'pt-br' ? "Arquivo de backup inválido." : "Invalid backup file structure.", "error");
+                    }
+                } catch(err) {
+                    console.error("Backup import error", err);
+                    showToast(currentLang === 'pt-br' ? "Erro ao decodificar arquivo JSON." : "Error decoding JSON backup file.", "error");
+                }
+                // Clear input field value to allow re-triggering file inputs
+                event.target.value = "";
+            };
+            reader.readAsText(file);
+        };
+
         function getRoadmapMarkdown(lang) {
             if (lang === 'pt-br') {
                 return `# 🚀 Roteiro de Lançamento do Projeto\n\n## 📅 Fase 1: Pesquisa & Descoberta\n- [ ] **Definir requisitos** e o escopo do MVP do projeto.\n- [ ] **Criar wireframes** e esboços de design para revisão da equipe.\n- [ ] **Alinhar a stack tecnológica** e os modelos de banco de dados.\n\n## 💻 Fase 2: Design & Desenvolvimento\n- [ ] **Configurar a estrutura do código** e roteamento básico.\n- [ ] **Implementar motores de colaboração em tempo real** (sincronização P2P).\n- [ ] **Otimizar métricas de performance** para melhor experiência do usuário.\n\n## 🚀 Fase 3: Lançamento & Iteração\n- [ ] **Realizar testes beta** com usuários internos.\n- [ ] **Coletar feedback dos usuários** e priorizar melhorias.\n- [ ] **Implantar o projeto Caderno v1.0** em produção!`;
@@ -2049,9 +2868,9 @@
 
         function getWelcomeGuideMarkdown(lang) {
             if (lang === 'pt-br') {
-                return `# Bem-vindo ao Caderno 📓\n\n### 👥 Sincronização P2P em Tempo Real\n1. **Sessão Compartilhada:** Envie o link de colaboração para a sua equipe.\n2. **Resolução de Conflitos:** Edições simultâneas são mescladas de forma inteligente e automática.\n3. **Caret Dinâmico:** Seu cursor de digitação acompanha as edições dos seus colegas sem se perder!\n4. **Cursores ao Vivo:** Veja com precisão cirúrgica onde cada membro do time está editando em tempo real.`;
+                return `# Bem-vindo ao Caderno 📓\n\n### 👥 Sincronização P2P em Tempo Real\n1. **Sessão Compartilhada:** Envie o link de colaboração para a sua equipe.\n2. **Resolução de Conflitos:** Edições simultâneas são mescladas de forma inteligente e automática.\n3. **Caret Dinâmico:** Seu cursor de digitação acompanha as edições dos seus colegas sem se perder!\n4. **Cursores ao Vivo:** Veja com precisão cirúrgica onde cada membro do time está editando em tempo real.\n\n### 🤫 Spoiler do Projeto\n- Aqui está um segredo de desenvolvimento do Caderno: ||O motor usa patches estruturais via Diff-Match-Patch (DMP) para sincronizar caracteres discretos diretamente sobre conexões WebRTC sem servidor centralizado!||`;
             } else {
-                return `# Welcome to Caderno 📓\n\n### 👥 Real-Time P2P Differential Sync\n1. **Shared Session:** Send the collaboration link to your team.\n2. **Conflict Resolution:** Simultaneous edits are now merged intelligently in real-time.\n3. **Dynamic Caret:** Your text cursor shifts gracefully while others type.\n4. **Live Presence Cursors:** See exactly where your team members are editing in real-time.`;
+                return `# Welcome to Caderno 📓\n\n### 👥 Real-Time P2P Differential Sync\n1. **Shared Session:** Send the collaboration link to your team.\n2. **Conflict Resolution:** Simultaneous edits are now merged intelligently in real-time.\n3. **Dynamic Caret:** Your text cursor shifts gracefully while others type.\n4. **Live Presence Cursors:** See exactly where your team members are editing in real-time.\n\n### 🤫 Project Spoilers\n- Here is a development secret about Caderno: ||The engine relies on structural patching via Diff-Match-Patch (DMP) to synchronize discrete characters directly over WebRTC links with absolutely zero middleman servers!||`;
             }
         }
     </script>
