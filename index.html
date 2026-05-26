@@ -1495,34 +1495,50 @@
             document.getElementById('btn-reading-mode').innerHTML = `<i class="fa-solid fa-book-open mr-1"></i> ` + t.modeReading;
             document.getElementById('btn-split-mode').innerHTML = `<i class="fa-solid fa-columns mr-1"></i> ` + t.modeSplit;
 
-            document.getElementById('profile-btn-text').innerText = t.profileBtn;
-            document.getElementById('profile-modal-header').innerText = t.profileTitle;
-            document.getElementById('profile-modal-desc').innerText = t.profileDesc;
-            document.getElementById('profile-label-nick').innerText = t.profileLabelNick;
-            document.getElementById('profile-label-color').innerText = t.profileLabelColor;
+            const profileBtnText = document.getElementById('profile-btn-text');
+            if (profileBtnText) profileBtnText.innerText = t.profileBtn;
+            
+            const profileModalHeader = document.getElementById('profile-modal-header');
+            if (profileModalHeader) profileModalHeader.innerText = t.profileTitle;
+            
+            const profileModalDesc = document.getElementById('profile-modal-desc');
+            if (profileModalDesc) profileModalDesc.innerText = t.profileDesc;
+            
+            const profileLabelNick = document.getElementById('profile-label-nick');
+            if (profileLabelNick) profileLabelNick.innerText = t.profileLabelNick;
+            
+            const profileLabelColor = document.getElementById('profile-label-color');
+            if (profileLabelColor) profileLabelColor.innerText = t.profileLabelColor;
 
             const flagContainer = document.getElementById('active-flag-container');
             const langCodeLabel = document.getElementById('active-lang-code');
-            if (lang === 'pt-br') {
-                flagContainer.innerHTML = svgBr;
-                langCodeLabel.innerText = 'PT-BR';
-            } else {
-                flagContainer.innerHTML = svgEn;
-                langCodeLabel.innerText = 'EN';
+            if (flagContainer && langCodeLabel) {
+                if (lang === 'pt-br') {
+                    flagContainer.innerHTML = svgBr;
+                    langCodeLabel.innerText = 'PT-BR';
+                } else {
+                    flagContainer.innerHTML = svgEn;
+                    langCodeLabel.innerText = 'EN';
+                }
             }
 
-            if (connections.length > 0) {
-                document.getElementById('collab-status-text').innerText = `${connections.length} ${t.collabActive}`;
-            } else {
-                const isConnecting = myPeer && !myPeer.destroyed;
-                document.getElementById('collab-status-text').innerText = isConnecting ? t.collabConnecting : t.collabAwaiting;
+            const collabStatusText = document.getElementById('collab-status-text');
+            if (collabStatusText) {
+                if (connections.length > 0) {
+                    collabStatusText.innerText = `${connections.length} ${t.collabActive}`;
+                } else {
+                    const isConnecting = myPeer && !myPeer.destroyed;
+                    collabStatusText.innerText = isConnecting ? t.collabConnecting : t.collabAwaiting;
+                }
             }
 
             const badge = document.getElementById("connection-mode-badge");
-            if (badge.innerText.includes("ACTIVE") || badge.innerText.includes("ATIVA")) {
-                badge.innerText = t.p2pMode;
-            } else {
-                badge.innerText = t.localMode;
+            if (badge) {
+                if (badge.innerText.includes("ACTIVE") || badge.innerText.includes("ATIVA")) {
+                    badge.innerText = t.p2pMode;
+                } else {
+                    badge.innerText = t.localMode;
+                }
             }
 
             const downloadBtnText = document.getElementById('download-btn-text');
