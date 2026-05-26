@@ -202,8 +202,16 @@
             border: 1px solid #3f3f46;
         }
         
+        #editor-overlays {
+            color: transparent; /* Default to transparent, children will set visible color */
+        }
         #editor-overlays div {
             min-height: 1.5rem; /* Match leading-6 */
+        }
+        
+        #markdown-textarea {
+            caret-color: #e2e8f0;
+            color: transparent !important; /* Always transparent, overlay handles text */
         }
         
         /* Used for overlay masking inside the textarea view */
@@ -1041,7 +1049,8 @@
             
             Object.keys(remotePeersData).forEach(peerId => {
                 const p = remotePeersData[peerId];
-                if (p.mouseX !== undefined && p.mouseY !== undefined) {
+                // Only render mouse if peer is in the same note
+                if (p.activeNote === window.activeNoteKey && p.mouseX !== undefined && p.mouseY !== undefined) {
                     const x = p.mouseX * window.innerWidth;
                     const y = p.mouseY * window.innerHeight;
                     
@@ -2016,25 +2025,31 @@
                     // In Hybrid mode, parse inactive lines but keep them single-line for alignment
                     lineHTML = parseHybridLine(line);
                 } else {
-                    // Raw mode or active line: show raw text but handle mentions/spoilers specifically
-                    lineHTML = escapeHTML(line);
+                    // Raw mode or active line: show visible text in overlay since textarea is transparent
+                    let rawLine = escapeHTML(line);
                     
-                    // Highlight Mentions
-                    lineHTML = lineHTML.replace(/@([A-Za-z0-9_À-ÿ]+(?: [A-Za-z0-9_À-ÿ]+)?)/g, (match) => {
-                        return `<span class="bg-obsidian-accent/20 border-b border-obsidian-accent/50 text-transparent rounded px-0.5">${match}</span>`;
+                    // Highlight Mentions (visible color)
+                    rawLine = rawLine.replace(/@([A-Za-z0-9_À-ÿ]+(?: [A-Za-z0-9_À-ÿ]+)?)/g, (match) => {
+                        let color = 'var(--accent-color)';
+                        const peers = [localUser, ...Object.values(remotePeersData)];
+                        const found = peers.find(p => p.name === match.slice(1));
+                        if (found) color = found.color;
+                        return `<span class="bg-obsidian-active text-white border-l-2 px-1 rounded" style="border-color: ${color}">${match}</span>`;
                     });
 
                     // Mask/Hide Spoilers on inactive lines
-                    lineHTML = lineHTML.replace(/\|\|(.*?)\|\|/g, (match) => {
+                    rawLine = rawLine.replace(/\|\|(.*?)\|\|/g, (match) => {
                         if (isActive) {
-                            // On active line, show markers but don't mask content
-                            return `<span class="border border-obsidian-accent/30 rounded px-0.5 text-transparent">${match}</span>`;
+                            // On active line, show markers and content
+                            return `<span class="border border-obsidian-accent/50 rounded px-0.5 text-gray-200 bg-obsidian-active/30">${match}</span>`;
                         } else {
                             // On inactive lines, mask content
                             const title = currentLang === 'pt-br' ? 'Spoiler: Ative a linha para editar' : 'Spoiler: Activate line to edit';
                             return `<span class="bg-neutral-900 text-neutral-900 rounded border border-neutral-700 select-none" title="${title}">${match}</span>`;
                         }
                     });
+
+                    lineHTML = `<span class="text-gray-200">${rawLine}</span>`;
                 }
 
                 finalHTML += `<div>${lineHTML || '&#8203;'}</div>`;
