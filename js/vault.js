@@ -47,6 +47,10 @@ window.initializeVaultState = function() {
     window.vaultInitialized = true;
 };
 
+window.findNoteKeyByTitle = function(title) {
+    return Object.keys(vault).find(key => vault[key].title.toLowerCase() === title.trim().toLowerCase());
+};
+
 function loadDefaultVault(lang) {
     vault = {
         "project_roadmap": {

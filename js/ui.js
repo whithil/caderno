@@ -675,6 +675,25 @@ function renderVaultList() {
 }
 window.renderVaultList = renderVaultList;
 
+window.handleWikilinkClick = function(noteKey, heading) {
+    if (vault[noteKey]) {
+        selectNote(noteKey);
+        if (heading) {
+            setTimeout(() => {
+                const lines = vault[noteKey].content.split('\n');
+                const h = heading.trim().toLowerCase();
+                const idx = lines.findIndex(l => {
+                    if (!l.startsWith('#')) return false;
+                    return l.replace(/^#+\s+/, '').trim().toLowerCase() === h;
+                });
+                if (idx !== -1) {
+                    if (window.scrollEditorToLine) window.scrollEditorToLine(idx);
+                }
+            }, 150);
+        }
+    }
+};
+
 function selectNote(key) {
     activeNoteKey = key;
     saveVaultLocalOnly(); 
