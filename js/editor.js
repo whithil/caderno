@@ -186,12 +186,17 @@ function loadActiveNote() {
     const note = vault[activeNoteKey];
     if (!note) return;
 
-    document.getElementById('breadcrumb-filename').innerText = note.title + ".md";
-    document.getElementById('active-tab-title').innerText = note.title;
-    document.getElementById('note-title-input').value = note.title;
+    const breadcrumb = document.getElementById('breadcrumb-filename');
+    if (breadcrumb) breadcrumb.innerText = note.title + ".md";
+    
+    const tabTitle = document.getElementById('active-tab-title');
+    if (tabTitle) tabTitle.innerText = note.title;
+    
+    const titleInput = document.getElementById('note-title-input');
+    if (titleInput) titleInput.value = note.title;
 
     const textarea = document.getElementById('markdown-textarea');
-    textarea.value = note.content;
+    if (textarea) textarea.value = note.content;
 
     renderActiveNote();
 }

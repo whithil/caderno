@@ -836,13 +836,21 @@ window.handleSourceInput = function() {
 };
 
 window.handleTitleInput = function() {
-    const title = document.getElementById('note-title-input').value.trim();
+    const titleInput = document.getElementById('note-title-input');
+    if (!titleInput) return;
+    
+    const title = titleInput.value.trim();
     if (title) {
         vault[activeNoteKey].title = title;
         if (window.saveVaultStructure) window.saveVaultStructure();
         if (window.renderVaultList) window.renderVaultList();
-        document.getElementById('breadcrumb-filename').innerText = title + ".md";
-        document.getElementById('active-tab-title').innerText = title;
+        
+        const breadcrumb = document.getElementById('breadcrumb-filename');
+        if (breadcrumb) breadcrumb.innerText = title + ".md";
+        
+        const tabTitle = document.getElementById('active-tab-title');
+        if (tabTitle) tabTitle.innerText = title;
+        
         if (viewMode === 'hybrid' && window.updateEditorOverlays) window.updateEditorOverlays();
     }
 };
