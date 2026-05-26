@@ -1,9 +1,12 @@
 window.onload = function() {
     initSidebars();
     window.initializeVaultState();
+    if (window.setViewMode) {
+        const preferredView = window.getPreferredViewMode ? window.getPreferredViewMode() : 'split';
+        window.setViewMode(preferredView);
+    }
     if (window.renderVaultList) window.renderVaultList();
     if (window.loadActiveNote) window.loadActiveNote();
-    if (window.setViewMode) window.setViewMode("hybrid");
     window.initP2PEngine();
 
     const textarea = document.getElementById('markdown-textarea');
@@ -155,10 +158,10 @@ function getPreferredViewMode() {
 }
 window.getPreferredViewMode = getPreferredViewMode;
 
-function setViewMode(mode) {
+function setViewMode(mode, persist = true) {
     if (mode === 'hybrid') mode = 'split';
     viewMode = mode;
-    if (['edit', 'reading', 'split'].includes(mode)) {
+    if (persist && ['edit', 'reading', 'split'].includes(mode)) {
         localStorage.setItem('caderno_view_mode', mode);
     }
     const editor = document.getElementById('editor-container');

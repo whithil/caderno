@@ -182,9 +182,17 @@ function escapeHTML(str) {
     }[tag] || tag));
 }
 
+function noteHasSpoilers(content) {
+    return typeof content === 'string' && /\|\|.*?\|\|/.test(content);
+}
+
 function loadActiveNote() {
     const note = vault[activeNoteKey];
     if (!note) return;
+
+    if (noteHasSpoilers(note.content) && viewMode !== 'reading') {
+        setViewMode('reading', false);
+    }
 
     const breadcrumb = document.getElementById('breadcrumb-filename');
     if (breadcrumb) breadcrumb.innerText = note.title + ".md";
