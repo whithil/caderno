@@ -135,7 +135,6 @@ window.applyUILanguage = function(lang) {
     const t = i18n[lang];
     
     document.getElementById('vault-logo-text').innerText = t.vaultTitle;
-    document.getElementById('breadcrumb-vault-label').innerText = t.breadcrumbFolder;
     document.getElementById('share-btn-text').innerText = t.shareBtn;
     document.getElementById('quick-search-text').innerText = t.quickSearch;
     document.getElementById('note-search').placeholder = t.searchNotes;
